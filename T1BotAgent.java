@@ -31,21 +31,14 @@ import ch.idsia.agents.Agent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
 import java.util.Random;
 
 public class T1BotAgent extends BasicMarioAIAgent implements Agent {
 
     int tick;
     private Random R = null;
-    //DEBE CAMBIARSE ACORDE A DONDE SE ESTÉ EJECUTANDO EL CÓDIGO
-    File fd = new File("ejemplos.txt");
-    BufferedWriter bw;
-    String newLine = System.getProperty("line.separator");
+    int mx;
+    int[] dataMatrix = new int[27];
 
     public T1BotAgent() {
         super("T1BotAgent");
@@ -56,21 +49,6 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
     public void reset() {
         // Dummy reset, of course, but meet formalities!
         R = new Random();
-    }
-
-    public void writeOnFile(float[] posMario, int[] posMarioEgo, int[] marioState, int[] infoEvaluacion, int reward){
-        //Recibe matriz de elementos a escribir en fichero
-        try{
-            FileWriter fw = new FileWriter(fd);
-            for (int mx = 0; mx < posMario.length; mx++) fw.write(posMario[mx] + " ");
-            for (int mx = 0; mx < posMarioEgo.length; mx++) fw.write(posMarioEgo[mx] + " ");
-            for (int mx = 0; mx < marioState.length; mx++) fw.write(marioState[mx] + " ");
-            for (int mx = 0; mx < infoEvaluacion.length; mx++) fw.write(infoEvaluacion[mx] + " ");
-            fw.write(reward + newLine);
-        }
-        catch(IOException e){
-            System.out.println("Error al escribir en archivo");
-        }
     }
 
     public void integrateObservation(Environment environment) {
@@ -85,7 +63,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         // En la interfaz Environment.java vienen definidos los metodos que se pueden emplear para recuperar informacion
         // del entorno de Mario. Algunos de los mas importantes (y que utilizaremos durante el curso)...
 
-        System.out.println("------------------ TICK " + tick + " ------------------");
+        //System.out.println("------------------ TICK " + tick + " ------------------");
 
         /*
         // Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con informacion de los elementos
@@ -138,49 +116,55 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         */
 
         // Posicion de Mario utilizando las coordenadas del sistema
-        System.out.println("POSICION MARIO");
+        //System.out.println("POSICION MARIO");
         float[] posMario;
         posMario = environment.getMarioFloatPos();
-        for (int mx = 0; mx < posMario.length; mx++)
-             System.out.print(posMario[mx] + " ");
+        //for (mx = 0; mx < posMario.length; mx++)
+          //System.out.print(posMario[mx] + " ");
 
         // Posicion que ocupa Mario en el array anterior
-        System.out.println("\nPOSICION MARIO MATRIZ");
+        //System.out.println("\nPOSICION MARIO MATRIZ");
         int[] posMarioEgo;
         posMarioEgo = environment.getMarioEgoPos();
-        for (int mx = 0; mx < posMarioEgo.length; mx++)
-             System.out.print(posMarioEgo[mx] + " ");
-
+        for (mx = 0; mx < posMarioEgo.length; mx++){
+          //System.out.print(posMarioEgo[mx] + " ");
+          dataMatrix[mx] = posMarioEgo[mx];
+        }
 
         // Estado de mario
         // marioStatus, marioMode, isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), isMarioAbleToShoot (1 o 0),
         // isMarioCarrying (1 o 0), killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
-        System.out.println("\nESTADO MARIO");
+        //System.out.println("\nESTADO MARIO");
         int[] marioState;
         marioState = environment.getMarioState();
-        for (int mx = 0; mx < marioState.length; mx++)
-             System.out.print(marioState[mx] + " ");
-
+        for (mx = 0; mx < marioState.length; mx++){
+          //System.out.print(marioState[mx] + " ");
+          dataMatrix[mx+posMarioEgo.length] = marioState[mx];
+        }
 
         // Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
         // marioStatus, mushroomsDevoured, coinsGained, timeLeft, timeSpent, hiddenBlocksFound
-        System.out.println("\nINFORMACION DE EVALUACION");
+        //System.out.println("\nINFORMACION DE EVALUACION");
         int[] infoEvaluacion;
         infoEvaluacion = environment.getEvaluationInfoAsInts();
-        for (int mx = 0; mx < infoEvaluacion.length; mx++)
-             System.out.print(infoEvaluacion[mx] + " ");
-
+        for (mx = 0; mx < infoEvaluacion.length; mx++){
+          //System.out.print(infoEvaluacion[mx] + " ");
+          dataMatrix[mx+posMarioEgo.length+marioState.length] = infoEvaluacion[mx];
+        }
 
         // Informacion del refuerzo/puntuacion que ha obtenido Mario. Nos puede servir para determinar lo bien o mal que lo esta haciendo.
         // Por defecto este valor engloba: reward for coins, killed creatures, cleared dead-ends, bypassed gaps, hidden blocks found
-        System.out.println("\nREFUERZO");
+        //System.out.println("\nREFUERZO");
         int reward = environment.getIntermediateReward();
-        System.out.print(reward);
-
-        System.out.println("\n");
+        //System.out.print(reward);
+        dataMatrix[26] = reward;
+        //System.out.println("\n");
         tick++;
-        writeOnFile(posMario, posMarioEgo, marioState, infoEvaluacion, reward);
+
+        //if tick == 0 crear file
+        //if tick == 2999 cerrarlo
+        environment.writeOnFile(posMario, dataMatrix, tick);
     }
 
     public boolean[] getAction() {
