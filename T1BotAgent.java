@@ -39,6 +39,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
     private Random R = null;
     int mx;
     int[] dataMatrix = new int[27];
+    byte[][] envi = new byte[19][19];
 
     public T1BotAgent() {
         super("T1BotAgent");
@@ -99,21 +100,19 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         }
         */
 
-        /*
         // Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
         // escena y los enemigos.
-        System.out.println("\nMERGE");
+        //System.out.println("\nMERGE");
         byte [][] env;
         env = environment.getMergedObservationZZ(1, 1);
         for (int mx = 0; mx < env.length; mx++) {
-            System.out.print(mx + ": [");
+            //System.out.print(mx + ": [");
             for (int my = 0; my < env[mx].length; my++)
-                System.out.print(env[mx][my] + " ");
-
-            System.out.println("]");
+                //System.out.print(env[mx][my] + " ");
+                envi[mx][my] = env[mx][my];
+            //System.out.println("]");
         }
-        */
 
         // Posicion de Mario utilizando las coordenadas del sistema
         //System.out.println("POSICION MARIO");
@@ -164,7 +163,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
 
         //if tick == 0 crear file
         //if tick == 2999 cerrarlo
-        environment.writeOnFile(posMario, dataMatrix, tick);
+        environment.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     public boolean[] getAction() {
