@@ -37,9 +37,15 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
 
     int tick;
     private Random R = null;
-    int mx;
-    int[] dataMatrix = new int[27];
-    byte[][] envi = new byte[19][19];
+    /**
+     * Atributos para almacenar la información del entorno de Mario
+     * y poder usarla para determinar su comportamiento
+     * (para que no vaya como pollo sin cabeza)
+     */
+    //int mx;
+    int[] dataMatrix = new int[27]; // Matriz de datos de los ticks
+    byte[][] envi = new byte[19][19]; // Matriz del entorno de Mario (el grid)
+    int jumpButtonPressed = -1;
 
     public T1BotAgent() {
         super("T1BotAgent");
@@ -125,7 +131,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         //System.out.println("\nPOSICION MARIO MATRIZ");
         int[] posMarioEgo;
         posMarioEgo = environment.getMarioEgoPos();
-        for (mx = 0; mx < posMarioEgo.length; mx++){
+        for (int mx = 0; mx < posMarioEgo.length; mx++){
           //System.out.print(posMarioEgo[mx] + " ");
           dataMatrix[mx] = posMarioEgo[mx];
         }
@@ -136,7 +142,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         //System.out.println("\nESTADO MARIO");
         int[] marioState;
         marioState = environment.getMarioState();
-        for (mx = 0; mx < marioState.length; mx++){
+        for (int mx = 0; mx < marioState.length; mx++){
           //System.out.print(marioState[mx] + " ");
           dataMatrix[mx+posMarioEgo.length] = marioState[mx];
         }
@@ -147,7 +153,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         //System.out.println("\nINFORMACION DE EVALUACION");
         int[] infoEvaluacion;
         infoEvaluacion = environment.getEvaluationInfoAsInts();
-        for (mx = 0; mx < infoEvaluacion.length; mx++){
+        for (int mx = 0; mx < infoEvaluacion.length; mx++){
           //System.out.print(infoEvaluacion[mx] + " ");
           dataMatrix[mx+posMarioEgo.length+marioState.length] = infoEvaluacion[mx];
         }
@@ -184,16 +190,43 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
 
 
-        for (int i = 0; i < Environment.numberOfKeys; ++i) {
-            boolean toggleParticularAction = R.nextBoolean();
-            toggleParticularAction = (i == 0 && toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
-            toggleParticularAction = (i == 1 || i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-            toggleParticularAction = (i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-            action[i] = toggleParticularAction;
+//        for (int i = 0; i < Environment.numberOfKeys; ++i) {
+//            boolean toggleParticularAction = R.nextBoolean();
+//            toggleParticularAction = (i == 0 && toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
+//            toggleParticularAction = (i == 1 || i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+//            toggleParticularAction = (i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+//            action[i] = toggleParticularAction;
+//        }
+        
+        action[0] = false;
+        action[1] = true; // Siempre adelante, valiente Mario
+        
+        for (int i = 0; i < 6; i++){
+        	switch (envi[this.marioEgoRow][this.marioEgoCol + i]){
+        	case -24:
+        	case -60:
+        	case -85:
+        	case 80:
+        		System.out.println("\nJump around!!");
+        		action[2] = false;
+        		action[3] = true;
+        		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
+        		break;
+        	case 93:
+        		System.out.println("\nSpiky-pooky!!");
+        		action[2] = false;
+        		action[3] = true;
+        		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
+        		break;
+        	default:
+            }
         }
-        if (action[1])
-            action[0] = false;
-
+        
+        if(tick == jumpButtonPressed + 3) {
+        	action[3] = false;
+        	jumpButtonPressed = -1;
+        }
+        
         return action;
     }
 }
