@@ -37,9 +37,6 @@ import ch.idsia.tools.EvaluationInfo;
 import ch.idsia.tools.MarioAIOptions;
 import ch.idsia.tools.punj.PunctualJudge;
 
-import java.io.File;
-import java.io.FileWriter;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -87,10 +84,6 @@ public static SystemOfValues IntermediateRewardsSystemOfValues = new SystemOfVal
 
 DecimalFormat df = new DecimalFormat("######.#");
 
-//Variables globales para el fichero de ejemplos.txt
-File fd = new File("ejemplos.txt");
-FileWriter fich = null;
-
 public static MarioEnvironment getInstance()
 {
     return ourInstance;
@@ -104,26 +97,6 @@ private MarioEnvironment()
 //        System.out.flush();
     System.out.println(GlobalOptions.getBenchmarkName());
     levelScene = new LevelScene();
-}
-
-//Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
-//Escribir en fichero los datos de los ticks
-public void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick){
-  //Recibe matriz de elementos a escribir en fichero
-  try{
-      fich = new FileWriter(fd,true);
-      //Get posicion de Mario en grid
-      for (int mx = 0; mx < posMario.length; mx++) fich.write(posMario[mx] + ", ");
-      //Get el resto de datos de los ticks
-      for (int mx = 0; mx < dataMatrix.length; mx++) fich.write(dataMatrix[mx] + ", ");
-      //getMergedObservationZZ
-      for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) fich.write(envi[mx][my] + ", ");
-      fich.write("\n");
-      fich.close();
-  }
-  catch(IOException e){
-      System.out.println("Error al escribir en archivo");
-  }
 }
 
 public void resetDefault()

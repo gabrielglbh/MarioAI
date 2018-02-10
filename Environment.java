@@ -61,8 +61,6 @@ public static final int MARIO_STATUS_RUNNING = Mario.STATUS_RUNNING;
 // Chaning ZLevel during the game on-the-fly;
 // if your agent recieves too ambiguous observation, it might request for more precise one for the next step
 
-public void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick);
-
 public void resetDefault();
 
 public void reset(String setUpOptions);

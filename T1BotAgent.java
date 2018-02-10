@@ -30,6 +30,7 @@ package ch.idsia.agents.controllers;
 import ch.idsia.agents.Agent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
+import ch.idsia.agents.controllers.FileWriter;
 
 import java.util.Random;
 
@@ -38,7 +39,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
     int tick;
     private Random R = null;
     /**
-     * Atributos para almacenar la informaci�n del entorno de Mario
+     * Atributos para almacenar la información del entorno de Mario
      * y poder usarla para determinar su comportamiento
      * (para que no vaya como pollo sin cabeza)
      */
@@ -84,7 +85,6 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
             System.out.print(mx + ": [");
             for (int my = 0; my < envesc[mx].length; my++)
                 System.out.print(envesc[mx][my] + " ");
-
             System.out.println("]");
         }
         */
@@ -101,7 +101,6 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
             System.out.print(mx + ": [");
             for (int my = 0; my < envenm[mx].length; my++)
                 System.out.print(envenm[mx][my] + " ");
-
             System.out.println("]");
         }
         */
@@ -166,10 +165,7 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         dataMatrix[26] = reward;
         //System.out.println("\n");
         tick++;
-
-        //if tick == 0 crear file
-        //if tick == 2999 cerrarlo
-        environment.writeOnFile(posMario, dataMatrix, envi, tick);
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi);
     }
 
     public boolean[] getAction() {
@@ -189,44 +185,60 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         // unica vez en el momento en que se pulsa. Para volver a saltar debeis despulsarlo (action[Mario.KEY_JUMP] = false),
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
 
+        //        for (int i = 0; i < Environment.numberOfKeys; ++i) {
+//                  boolean toggleParticularAction = R.nextBoolean();
+//                  toggleParticularAction = (i == 0 && toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
+//                  toggleParticularAction = (i == 1 || i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+//                  toggleParticularAction = (i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+//                  action[i] = toggleParticularAction;
+//                }
 
-//        for (int i = 0; i < Environment.numberOfKeys; ++i) {
-//            boolean toggleParticularAction = R.nextBoolean();
-//            toggleParticularAction = (i == 0 && toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
-//            toggleParticularAction = (i == 1 || i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-//            toggleParticularAction = (i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-//            action[i] = toggleParticularAction;
-//        }
-        
-        action[0] = false;
+        action[0] = false; // Nunca ir a la izquierda, de momento...
         action[1] = true; // Siempre adelante, valiente Mario
-        
-        for (int i = 0; i < 6; i++){
+        action[4] = true;
+        boolean toggleParticularAction = R.nextBoolean();
+        toggleParticularAction = (toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
+        toggleParticularAction = (!toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+        toggleParticularAction = (!toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
+        action[4] = toggleParticularAction; // The fairy told me to burn stuff
+
+        for (int i = 9; i > 0; i--){
         	switch (envi[this.marioEgoRow][this.marioEgoCol + i]){
-        	case -24:
-        	case -60:
-        	case -85:
-        	case 80:
-        		System.out.println("\nJump around!!");
-        		action[2] = false;
-        		action[3] = true;
-        		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
-        		break;
-        	case 93:
-        		System.out.println("\nSpiky-pooky!!");
-        		action[2] = false;
-        		action[3] = true;
-        		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
-        		break;
-        	default:
-            }
+            //Nivel 0 de dificultad:
+              case -22: //Ladrillo irrompible con interrogacion
+              case -60: //Obstaculo del que no se puede pasar
+              case -80: //Cañon
+              case -62: //Obstáculo sobre el que se puede saltar y mantenerse encima
+              case 80: //Goomba
+              case 95: //Goomba con alas
+              case 82: //Koopa rojo
+              case 97: //Koopa rojo con alas
+              case 81: //Koopa verde
+              case 96: //Koopa verde con alas
+              case 84: //Bala
+              case 93: //Enemigo puntiagudo
+              case 99: //Enemigo puntiagudo con alas
+              case 91: //Flor enemiga
+              case 13: //Caparazón
+              case -42: //Tipo de enemigo indefinido
+            //Nivel 1 de dificultad: (Casos repetidos en el nivel 0)
+              case -24: //Ladrillo
+              case -85: //Tuberia ocn flor o cañon
+            //Nivel 2 de dificultad:
+              case 1:
+            		action[2] = false;
+            		action[3] = true;
+            		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
+            		break;
+            	default:
+          }
         }
-        
-        if(tick == jumpButtonPressed + 3) {
-        	action[3] = false;
-        	jumpButtonPressed = -1;
+
+        if(tick == jumpButtonPressed + 4) {
+      	  action[3] = false;
+      	  jumpButtonPressed = -1;
         }
-        
+
         return action;
     }
 }
