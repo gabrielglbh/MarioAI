@@ -13,18 +13,13 @@ public class FileWriterData{
   static File fd  = new File("ejemplos.txt");
   static FileWriter fich = null;
   //Queue para escribir los enemigos abatidos y monedas recogidas hace 5 ticks
-  Queue<Integer> qEnemies;
-  Queue<Integer> qCoins;
+  static Queue<Integer> qEnemies = new LinkedList<Integer>();
+  static Queue<Integer> qCoins = new LinkedList<Integer>();
 
-  int enemies;
-  int coins;
+  static int enemies = 0;
+  static int coins = 0;
 
   public FileWriterData(){
-    qEnemies = new LinkedList<Integer>();
-    qCoins = new LinkedList<Integer>();
-
-    enemies = 0;
-    coins = 0;
   }
 
   //No se usa en nada de momento
@@ -41,7 +36,6 @@ public class FileWriterData{
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick){
-    if(tick <= 0) FileWriterData f = new FileWriterData();
     //Recibe matriz de elementos a escribir en fichero
     try{
         fich = new FileWriter(fd,true);
@@ -51,18 +45,19 @@ public class FileWriterData{
         for (int mx = 0; mx < dataMatrix.length; mx++){
           fich.write(dataMatrix[mx] + ", ");
           //Añadir los enemigos
-          f.qEnemies.add(dataMatrix[19]);
+          qEnemies.add(dataMatrix[19]);
           //Añadir las monedas
-          f.qCoins.add(dataMatrix[23]);
+          qCoins.add(dataMatrix[23]);
         }
         //getMergedObservationZZ
         for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) fich.write(envi[mx][my] + ", ");
 
         //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
         if(tick >= 6){
-          f.enemies = qEnemies.poll();
-          f.coins = qCoins.poll();
-          fich.write(f.enemies + ", " + f.coins);
+          //Eliminar y mostrar la head de la cola, LRI
+          enemies = qEnemies.poll();
+          coins = qCoins.poll();
+          fich.write(enemies + ", " + coins);
         }
 
         fich.write("\n");
