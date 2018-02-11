@@ -39,6 +39,8 @@ public class FileWriterData{
     //Recibe matriz de elementos a escribir en fichero
     try{
         fich = new FileWriter(fd,true);
+        //getMergedObservationZZ
+        for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) fich.write(envi[mx][my] + ", ");
         //Get posicion de Mario en grid
         for (int mx = 0; mx < posMario.length; mx++) fich.write(posMario[mx] + ", ");
         //Get el resto de datos de los ticks
@@ -49,8 +51,6 @@ public class FileWriterData{
           //Añadir las monedas
           qCoins.add(dataMatrix[23]);
         }
-        //getMergedObservationZZ
-        for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) fich.write(envi[mx][my] + ", ");
 
         //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
         if(tick >= 6){
