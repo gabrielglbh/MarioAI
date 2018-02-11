@@ -30,7 +30,7 @@ package ch.idsia.agents.controllers;
 import ch.idsia.agents.Agent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
-import ch.idsia.agents.controllers.FileWriter;
+import ch.idsia.agents.controllers.FileWriterData;
 
 import java.util.Random;
 
@@ -39,12 +39,12 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
     int tick;
     private Random R = null;
     /**
-     * Atributos para almacenar la información del entorno de Mario
+     * Atributos para almacenar la informaciÃ³n del entorno de Mario
      * y poder usarla para determinar su comportamiento
      * (para que no vaya como pollo sin cabeza)
      */
     //int mx;
-    int[] dataMatrix = new int[27]; // Matriz de datos de los ticks
+    int[] dataMatrix = new int[27]; // Matriz de información de la partida en cada tick
     byte[][] envi = new byte[19][19]; // Matriz del entorno de Mario (el grid)
     int jumpButtonPressed = -1;
 
@@ -60,10 +60,10 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
     }
 
     public void integrateObservation(Environment environment) {
-        // IMPORTANTE: Si se utilizan métodos que tardan mucho como println, cada tick puede tardar en procesarse más de
-        // de lo que permite la competición de Mario AI. Si el agente es demasiado lento procesando y el simulador no
-        // puede funcionar en tiempo real, se cerrará automáticamente, lor lo que se insta a que el código escrito sea
-        // lo más eficiente posible.
+        // IMPORTANTE: Si se utilizan mÃ©todos que tardan mucho como println, cada tick puede tardar en procesarse mÃ¡s de
+        // de lo que permite la competiciÃ³n de Mario AI. Si el agente es demasiado lento procesando y el simulador no
+        // puede funcionar en tiempo real, se cerrarÃ¡ automÃ¡ticamente, lor lo que se insta a que el cÃ³digo escrito sea
+        // lo mÃ¡s eficiente posible.
 
 
         // INFORMACION DEL ENTORNO
@@ -161,11 +161,11 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
         // Por defecto este valor engloba: reward for coins, killed creatures, cleared dead-ends, bypassed gaps, hidden blocks found
         //System.out.println("\nREFUERZO");
         int reward = environment.getIntermediateReward();
-        //System.out.print(reward);
+
         dataMatrix[26] = reward;
-        //System.out.println("\n");
         tick++;
-        FileWriterData.writeOnFile(posMario, dataMatrix, envi);
+
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     public boolean[] getAction() {
@@ -207,8 +207,8 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
             //Nivel 0 de dificultad:
               case -22: //Ladrillo irrompible con interrogacion
               case -60: //Obstaculo del que no se puede pasar
-              case -80: //Cañon
-              case -62: //Obstáculo sobre el que se puede saltar y mantenerse encima
+              case -80: //CaÃ±on
+              case -62: //ObstÃ¡culo sobre el que se puede saltar y mantenerse encima
               case 80: //Goomba
               case 95: //Goomba con alas
               case 82: //Koopa rojo
@@ -219,16 +219,16 @@ public class T1BotAgent extends BasicMarioAIAgent implements Agent {
               case 93: //Enemigo puntiagudo
               case 99: //Enemigo puntiagudo con alas
               case 91: //Flor enemiga
-              case 13: //Caparazón
+              case 13: //CaparazÃ³n
               case -42: //Tipo de enemigo indefinido
             //Nivel 1 de dificultad: (Casos repetidos en el nivel 0)
               case -24: //Ladrillo
-              case -85: //Tuberia ocn flor o cañon
+              case -85: //Tuberia ocn flor o caÃ±on
             //Nivel 2 de dificultad:
               case 1:
             		action[2] = false;
             		action[3] = true;
-            		if(jumpButtonPressed < 0)jumpButtonPressed = tick;
+            		if(jumpButtonPressed < 0) jumpButtonPressed = tick;
             		break;
             	default:
           }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012-2013, Moisés Martínez
+ * Copyright (c) 2012-2013, MoisÃ©s MartÃ­nez
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,11 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import ch.idsia.agents.controllers.FileWriterData;
+
 /**
  * Created by PLG Group.
- * User: Moisés Martínez
+ * User: MoisÃ©s MartÃ­nez
  * Date: Jan 24, 2014
  * Package: ch.idsia.controllers.agents.controllers;
  */
@@ -45,9 +47,13 @@ public final class T1HumanAgent extends KeyAdapter implements Agent
     private boolean[] Action    = null;
     private String Name         = "HumanAgent";
 
+    // NUEVO ATRIBUTO: hemos añadido tick (para escribir en el archivo la info de hace 5 ticks)
+    int tick;
+
     public T1HumanAgent()
     {
         this.reset();
+        tick = 0;
     }
 
     @Override
@@ -62,7 +68,48 @@ public final class T1HumanAgent extends KeyAdapter implements Agent
     @Override
     public void integrateObservation(Environment environment)
     {
+    	int[] dataMatrix = new int[27]; // Matriz de información de la partida en cada tick
 
+    	// Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
+        // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
+        // escena y los enemigos.
+    	byte[][] envi;
+    	envi = environment.getMergedObservationZZ(1, 1);
+
+    	// Posicion de Mario utilizando las coordenadas del sistema
+    	float[] posMario;
+    	posMario = environment.getMarioFloatPos();
+
+    	// Posicion que ocupa Mario en el array anterior
+    	int[] posMarioEgo;
+        posMarioEgo = environment.getMarioEgoPos();
+        for (int mx = 0; mx < posMarioEgo.length; mx++){
+          dataMatrix[mx] = posMarioEgo[mx];
+        }
+
+        // Estado de mario
+        // marioStatus, marioMode, isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), isMarioAbleToShoot (1 o 0),
+        // isMarioCarrying (1 o 0), killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
+        int[] marioState;
+        marioState = environment.getMarioState();
+        for (int mx = 0; mx < marioState.length; mx++){
+          dataMatrix[mx+posMarioEgo.length] = marioState[mx];
+        }
+
+        // Mas informacion de evaluacion...
+        // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
+        // marioStatus, mushroomsDevoured, coinsGained, timeLeft, timeSpent, hiddenBlocksFound
+        int[] infoEvaluacion;
+        infoEvaluacion = environment.getEvaluationInfoAsInts();
+        for (int mx = 0; mx < infoEvaluacion.length; mx++){
+          dataMatrix[mx+posMarioEgo.length+marioState.length] = infoEvaluacion[mx];
+        }
+
+        int reward = environment.getIntermediateReward();
+        dataMatrix[26] = reward;
+
+        tick++;
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     @Override
@@ -115,7 +162,6 @@ public final class T1HumanAgent extends KeyAdapter implements Agent
             case KeyEvent.VK_UP:
                 Action[Mario.KEY_UP] = isPressed;
                 break;
-
             case KeyEvent.VK_S:
                 Action[Mario.KEY_JUMP] = isPressed;
                 break;
