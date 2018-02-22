@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 import java.nio.file.Files;
 import java.util.*;
@@ -11,6 +13,8 @@ import java.util.*;
 public class FileWriterData{
   //Variables globales para el fichero de ejemplos.txt
   static FileWriter fich = null;
+  static BufferedReader br = null;
+  static File file = null;
   //Queue para escribir los enemigos abatidos y monedas recogidas hace 5 ticks
   static Queue<Integer> qEnemies = new LinkedList<Integer>();
   static Queue<Integer> qCoins = new LinkedList<Integer>();
@@ -72,7 +76,7 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE hiddenBlocksFound NUMERIC \n");
       fich.write("@ATTRIBUTE reward NUMERIC \n");
       fich.write("@ATTRIBUTE classInstancia NUMERIC \n");
-      fich.write("\n @data \n");
+      fich.write("\n@data \n");
     }
     catch(IOException e){
         e.printStackTrace(System.out);
@@ -108,9 +112,12 @@ public class FileWriterData{
     //Escribir en el fichero toda una instacia
     try{
         fich = new FileWriter("ejemplos.arff",true);
+        file = new File("ejemplos.arff");
+        br = new BufferedReader(new FileReader("ejemplos.arff"));
 
         //Establecer Header de fichero arff únicamente en el primer tick
-        if(tick == 1) init_arff(envi);
+        //Si no existe el fichero o existe y está vacío...
+        if(br.readLine() == null || !file.exists()) init_arff(envi);
 
         for(mz = 0; mz < length_instance; mz++){
           if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
