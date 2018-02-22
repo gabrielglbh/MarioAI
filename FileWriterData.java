@@ -22,9 +22,7 @@ public class FileWriterData{
   static int mz = 0;
   static int length_instance = 0;
 
-  public FileWriterData(){ 
-    
-  }
+  public FileWriterData(){}
 
   //No se usa en nada de momento
   // public static void prepareFile(){
@@ -37,6 +35,50 @@ public class FileWriterData{
 	//   }
   // }
 
+  public static void init_arff(byte[][] envi){
+    try{
+      fich = new FileWriter("ejemplos.arff",true);
+      for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
+        fich.write("@ATTRIBUTE pos_environment_[" + mx + "," + my + "] NUMERIC \n");
+      }
+      fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
+      fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
+      fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
+      fich.write("@ATTRIBUTE marioMode NUMERIC \n");
+      fich.write("@ATTRIBUTE isMarioOnGround NUMERIC \n");
+      fich.write("@ATTRIBUTE isMarioAbleToJump NUMERIC \n");
+      fich.write("@ATTRIBUTE isMarioAbleToShoot NUMERIC \n");
+      fich.write("@ATTRIBUTE isMarioCarrying NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByStomp NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
+      fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
+      fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
+      fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
+      fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByStomp NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal NUMERIC \n");
+      fich.write("@ATTRIBUTE marioMode NUMERIC \n");
+      fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
+      fich.write("@ATTRIBUTE mushroomsDevoured NUMERIC \n");
+      fich.write("@ATTRIBUTE coinsGained NUMERIC \n");
+      fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
+      fich.write("@ATTRIBUTE timeSpent NUMERIC \n");
+      fich.write("@ATTRIBUTE hiddenBlocksFound NUMERIC \n");
+      fich.write("@ATTRIBUTE reward NUMERIC \n");
+      fich.write("@ATTRIBUTE classInstancia NUMERIC \n");
+      fich.write("\n @data \n");
+    }
+    catch(IOException e){
+        e.printStackTrace(System.out);
+    }
+  }
+
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int classWeka, int tick){
@@ -44,6 +86,7 @@ public class FileWriterData{
     length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length+1;
     String[] instancia = new String[length_instance];
 
+    //Meter todo en matriz instancia
     for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
       instancia[mz] = String.valueOf(envi[mx][my]);
       mz++;
@@ -59,37 +102,40 @@ public class FileWriterData{
       mz++;
     }
 
+    //CLASSWEKA ESTÁ EN instancia[378]
     instancia[mz] = String.valueOf(classWeka);
 
-    //if(tick >= 24){ //Somos adivinos, y solo va a escribir en el fichero cuando esté en el tick del futuro, 24
-      try{
-          fich = new FileWriter("ejemplos.arff",true);
-          for(mz = 0; mz < length_instance; mz++){
-            if(mz != length_instance-1) fich.write(instancia[mz] + ", "); 
-	    else fich.write(instancia[mz]);
-          }
-          fich.write("\n");
-         
-            //Añadir los enemigos
-          //  qEnemies.add(dataMatrix[8]);
-            //Añadir las monedas
-          //  qCoins.add(dataMatrix[23]);
-          //}
+    //Escribir en el fichero toda una instacia
+    try{
+        fich = new FileWriter("ejemplos.arff",true);
 
-          //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
-          // if(tick >= 6){
-          //   //Eliminar y mostrar la head de la cola, LRI
-          //   enemies = qEnemies.poll();
-          //   coins = qCoins.poll();
-          //   fich.write(enemies + ", " + coins + ", ");
-          // }
+        //Establecer Header de fichero arff únicamente en el primer tick
+        if(tick == 1) init_arff(envi);
 
-          fich.close();
-          mz = 0;
-      }
-      catch(IOException e){
-          e.printStackTrace(System.out);
-      }
-    //}
+        for(mz = 0; mz < length_instance; mz++){
+          if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
+          else fich.write(instancia[mz] + "\n");
+        }
+
+          //Añadir los enemigos
+        //  qEnemies.add(dataMatrix[8]);
+          //Añadir las monedas
+        //  qCoins.add(dataMatrix[23]);
+        //}
+
+        //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
+        // if(tick >= 6){
+        //   //Eliminar y mostrar la head de la cola, LRI
+        //   enemies = qEnemies.poll();
+        //   coins = qCoins.poll();
+        //   fich.write(enemies + ", " + coins + ", ");
+        // }
+
+        fich.close();
+        mz = 0;
+    }
+    catch(IOException e){
+        e.printStackTrace(System.out);
+    }
   }
 }
