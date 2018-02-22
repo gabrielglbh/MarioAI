@@ -19,9 +19,11 @@ public class FileWriterData{
   static int enemies = 0;
   static int coins = 0;
   static char b;
+  static int mz = 0;
   static int length_instance = 0;
 
-  public FileWriterData(){
+  public FileWriterData(){ 
+    
   }
 
   //No se usa en nada de momento
@@ -42,25 +44,27 @@ public class FileWriterData{
     length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length+1;
     String[] instancia = new String[length_instance];
 
-    for(int mz = 0; mz < (length_instance-(posMario.length+dataMatrix.length+1)); mz++){
-      for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++)
-        instancia[mz] = String.valueOf(envi[mx][my]);
+    for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
+      instancia[mz] = String.valueOf(envi[mx][my]);
+      mz++;
     }
 
-    for(int mz = envi.length*envi[0].length; mz < ((length_instance)-(dataMatrix.length+1)); mz++){
-      for(int mx = 0; mx < posMario.length; mx++) instancia[mz] = String.valueOf(posMario[mx]);
+    for(int mx = 0; mx < posMario.length; mx++){
+      instancia[mz] = String.valueOf(posMario[mx]);
+      mz++;
     }
 
-    for(int mz = envi.length*envi[0].length+posMario.length; mz < (length_instance-1); mz++){
-      for(int mx = 0; mx < dataMatrix.length; mx++) instancia[mz] = String.valueOf(dataMatrix[mx]);
+    for(int mx = 0; mx < dataMatrix.length; mx++){
+      instancia[mz] = String.valueOf(dataMatrix[mx]);
+      mz++;
     }
 
-    instancia[envi.length*envi[0].length+posMario.length+dataMatrix.length] = String.valueOf(classWeka);
+    instancia[mz] = String.valueOf(classWeka);
 
     //if(tick >= 24){ //Somos adivinos, y solo va a escribir en el fichero cuando esté en el tick del futuro, 24
       try{
           fich = new FileWriter("ejemplos.arff",true);
-          for(int mz = 0; mz < length_instance; mz++){
+          for(mz = 0; mz < length_instance; mz++){
             if(mz != length_instance-1) fich.write(instancia[mz] + ", "); 
 	    else fich.write(instancia[mz]);
           }
@@ -81,6 +85,7 @@ public class FileWriterData{
           // }
 
           fich.close();
+          mz = 0;
       }
       catch(IOException e){
           e.printStackTrace(System.out);
