@@ -12,13 +12,14 @@ public class FileWriterData{
   //Variables globales para el fichero de ejemplos.txt
   static FileWriter fich = null;
   //Queue para escribir los enemigos abatidos y monedas recogidas hace 5 ticks
-  static Queue<Integer> qEnemies = new LinkedList<Integer[]>();
+  static Queue<Integer> qEnemies = new LinkedList<Integer>();
   static Queue<Integer> qCoins = new LinkedList<Integer>();
   static Queue<Integer> qInstancia= new LinkedList<Integer>();
 
   static int enemies = 0;
   static int coins = 0;
   static char b;
+  static int length_instance = 0;
 
   public FileWriterData(){
   }
@@ -38,26 +39,38 @@ public class FileWriterData{
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int classWeka, int tick){
 
-    for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) qInstancia.add(envi[mx][my]);
-    for(int mx = 0; mx < posMario.length; mx++) qInstancia.add(posMario[mx]);
-    for(int mx = 0; mx < dataMatrix.length; mx++) qInstancia.add(dataMatrix[mx]);
-    qInstancia.add(classWeka);
+    length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length+1;
+    String[] instancia = new String[length_instance];
 
-    if(tick >= 24){ //Somos adivinos, y solo va a escribir en el fichero cuando esté en el tick del futuro, 24
+    for(int mz = 0; mz < (length_instance-(posMario.length+dataMatrix.length+1)); mz++){
+      for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++)
+        instancia[mz] = String.valueOf(envi[mx][my]);
+    }
+
+    for(int mz = envi.length*envi[0].length; mz < ((length_instance)-(dataMatrix.length+1)); mz++){
+      for(int mx = 0; mx < posMario.length; mx++) instancia[mz] = String.valueOf(posMario[mx]);
+    }
+
+    for(int mz = envi.length*envi[0].length+posMario.length; mz < (length_instance-1); mz++){
+      for(int mx = 0; mx < dataMatrix.length; mx++) instancia[mz] = String.valueOf(dataMatrix[mx]);
+    }
+
+    instancia[envi.length*envi[0].length+posMario.length+dataMatrix.length] = String.valueOf(classWeka);
+
+    //if(tick >= 24){ //Somos adivinos, y solo va a escribir en el fichero cuando esté en el tick del futuro, 24
       try{
           fich = new FileWriter("ejemplos.arff",true);
-          //getMergedObservationZZ
-          for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++) fich.write(envi[mx][my] + ", ");
-          //Get posicion de Mario en grid
-          for(int mx = 0; mx < posMario.length; mx++) fich.write(posMario[mx] + ", ");
-          //Get el resto de datos de los ticks
-          for(int mx = 0; mx < dataMatrix.length; mx++){
-            fich.write(dataMatrix[mx] + ", ");
-            //Añadir los enemigos
-            qEnemies.add(dataMatrix[8]);
-            //Añadir las monedas
-            qCoins.add(dataMatrix[23]);
+          for(int mz = 0; mz < length_instance; mz++){
+            if(mz != length_instance-1) fich.write(instancia[mz] + ", "); 
+	    else fich.write(instancia[mz]);
           }
+          fich.write("\n");
+         
+            //Añadir los enemigos
+          //  qEnemies.add(dataMatrix[8]);
+            //Añadir las monedas
+          //  qCoins.add(dataMatrix[23]);
+          //}
 
           //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
           // if(tick >= 6){
@@ -67,15 +80,11 @@ public class FileWriterData{
           //   fich.write(enemies + ", " + coins + ", ");
           // }
 
-          //Last added is the class (distancePassedPhys)
-          fich.write(classWeka + " TICKS: " + tick + "\n");
-          System.out.println("Ticks: " + tick);
-
           fich.close();
       }
       catch(IOException e){
           e.printStackTrace(System.out);
       }
-    }
+    //}
   }
 }

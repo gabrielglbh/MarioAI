@@ -166,7 +166,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         dataMatrix[26] = reward;
         tick++;
 
-        int classWeka = EvaluationInfo.distancePassedPhys;
+        int classWeka = environment.getEvaluationInfo().distancePassedPhys;
 
         FileWriterData.writeOnFile(posMario, dataMatrix, envi, classWeka, tick);
     }
