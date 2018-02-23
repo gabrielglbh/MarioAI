@@ -164,11 +164,21 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         int reward = environment.getIntermediateReward();
 
         dataMatrix[26] = reward;
+
+        //Mover distancePassedPhys a la ultima posicion de dataMatrix
+        /*12 es el numero de posiciones a rotar la matriz de dataMatrix para que distancePassedPhys quede
+          en últime posicion*/
+        int offset = dataMatrix.length - 12 % dataMatrix.length;
+        if (offset > 0) {
+            int[] copy = dataMatrix.clone();
+            for (int i = 0; i < dataMatrix.length; ++i) {
+                int j = (i + offset) % dataMatrix.length;
+                dataMatrix[i] = copy[j];
+            }
+        }
+
         tick++;
-
-        int classWeka = environment.getEvaluationInfo().distancePassedPhys;
-
-        FileWriterData.writeOnFile(posMario, dataMatrix, envi, classWeka, tick);
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     public boolean[] getAction() {
