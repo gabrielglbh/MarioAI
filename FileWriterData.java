@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedReader;
-import java.io.FileReader; 
+import java.io.FileReader;
 
 import java.nio.file.Files;
 import java.util.*;
@@ -42,8 +42,9 @@ public class FileWriterData{
   public static void init_arff(byte[][] envi){
     try{
       fich = new FileWriter("ejemplos.arff",true);
+      fich.write("@RELATION Mario_Datos_Ticks\n\n");
       for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
-        fich.write("@ATTRIBUTE pos_environment_[" + mx + "," + my + "] NUMERIC \n");
+        fich.write("@ATTRIBUTE pos_environment_[" + mx + "_" + my + "] NUMERIC \n");
       }
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
@@ -62,18 +63,17 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE reward NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
-      fich.write("@ATTRIBUTE marioMode NUMERIC \n");
+      fich.write("@ATTRIBUTE marioStatus_2 NUMERIC \n");// A partir de aquí se repiten movidas
+      fich.write("@ATTRIBUTE marioMode_2 NUMERIC \n");
       fich.write("@ATTRIBUTE isMarioOnGround NUMERIC \n");
       fich.write("@ATTRIBUTE isMarioAbleToJump NUMERIC \n");
       fich.write("@ATTRIBUTE isMarioAbleToShoot NUMERIC \n");
       fich.write("@ATTRIBUTE isMarioCarrying NUMERIC \n");
-      fich.write("@ATTRIBUTE killsTotal NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByStomp NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
-      fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
-      fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByFire_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByStomp_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByShell_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE timeLeft_2 NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
       fich.write("\n@data \n");
     }
@@ -112,12 +112,12 @@ public class FileWriterData{
         br = new BufferedReader(new FileReader("ejemplos.arff"));
 
         //Establecer Header de fichero arff únicamente en el primer tick
-        //Si no existe el fichero o existe y está vacío...
+        //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
         if(br.readLine() == null || !file.exists()) init_arff(envi);
 
         for(mz = 0; mz < length_instance; mz++){
           if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
-          else fich.write(instancia[mz] + "\n");
+          else fich.write(instancia[mz] + " \n");
         }
 
           //Añadir los enemigos
