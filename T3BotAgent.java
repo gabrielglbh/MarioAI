@@ -45,9 +45,12 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
      * (para que no vaya como pollo sin cabeza)
      */
     //int mx;
-    int[] dataMatrix = new int[27]; // Matriz de información de la partida en cada tick
+    int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
     byte[][] envi = new byte[19][19]; // Matriz del entorno de Mario (el grid)
     int jumpButtonPressed = -1;
+    int coinsInScreen = 0;
+    int blocksInScreen = 0;
+    int enemiesInScreen = 0;
 
     public T3BotAgent() {
         super("T3BotAgent");
@@ -111,13 +114,30 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         // escena y los enemigos.
         //System.out.println("\nMERGE");
         byte [][] env;
+        coinsInScreen = 0;
+        enemiesInScreen = 0;
+        blocksInScreen = 0;
         env = environment.getMergedObservationZZ(1, 1);
         for (int mx = 0; mx < env.length; mx++) {
             //System.out.print(mx + ": [");
-            for (int my = 0; my < env[mx].length; my++)
+            for (int my = 0; my < env[mx].length; my++) {
                 //System.out.print(env[mx][my] + " ");
                 envi[mx][my] = env[mx][my];
+                //Coins on screen
+                if(envi[mx][my] == 2) coinsInScreen++;
+                //If blocks
+                if(envi[mx][my] == -22 || envi[mx][my] == -60 || envi[mx][my] == -80 ||
+                    envi[mx][my] == -62 || envi[mx][my] == -24 || envi[mx][my] == -85)
+                    blocksInScreen++;
+                //If enemies
+                if(envi[mx][my] == 1 || envi[mx][my] == 80 || envi[mx][my] == 95 ||
+                    envi[mx][my] == 82 || envi[mx][my] == 97 || envi[mx][my] == 81 ||
+                    envi[mx][my] == 96 || envi[mx][my] == 84 || envi[mx][my] == 93 ||
+                    envi[mx][my] == 99 || envi[mx][my] == 91 || envi[mx][my] == 13 ||
+                    envi[mx][my] == -42)
+                    enemiesInScreen++;
             //System.out.println("]");
+            }
         }
 
         // Posicion de Mario utilizando las coordenadas del sistema
@@ -142,10 +162,10 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         //System.out.println("\nESTADO MARIO");
         int[] marioState;
         marioState = environment.getMarioState();
-        for (int mx = 0; mx < marioState.length; mx++){
+        //for (int mx = 0; mx < marioState.length; mx++){
           //System.out.print(marioState[mx] + " ");
-          dataMatrix[mx+posMarioEgo.length] = marioState[mx];
-        }
+          //dataMatrix[mx+posMarioEgo.length] = marioState[mx];
+        //}
 
         // Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
@@ -155,7 +175,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         infoEvaluacion = environment.getEvaluationInfoAsInts();
         for (int mx = 0; mx < infoEvaluacion.length; mx++){
           //System.out.print(infoEvaluacion[mx] + " ");
-          dataMatrix[mx+posMarioEgo.length+marioState.length] = infoEvaluacion[mx];
+          dataMatrix[mx+posMarioEgo.length] = infoEvaluacion[mx];
         }
 
         // Informacion del refuerzo/puntuacion que ha obtenido Mario. Nos puede servir para determinar lo bien o mal que lo esta haciendo.
@@ -163,12 +183,15 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         //System.out.println("\nREFUERZO");
         int reward = environment.getIntermediateReward();
 
-        dataMatrix[26] = reward;
+        dataMatrix[16] = coinsInScreen;
+        dataMatrix[17] = blocksInScreen;
+        dataMatrix[18] = enemiesInScreen;
+        dataMatrix[19] = reward;
 
         //Mover distancePassedPhys a la ultima posicion de dataMatrix
         /*12 es el numero de posiciones a rotar la matriz de dataMatrix para que distancePassedPhys quede
           en últime posicion*/
-        int offset = dataMatrix.length - 12 % dataMatrix.length;
+        int offset = dataMatrix.length - 16 % dataMatrix.length;
         if (offset > 0) {
             int[] copy = dataMatrix.clone();
             for (int i = 0; i < dataMatrix.length; ++i) {
@@ -176,7 +199,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
                 dataMatrix[i] = copy[j];
             }
         }
-
+        
         tick++;
         FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }

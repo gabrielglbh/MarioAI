@@ -15,10 +15,9 @@ public class FileWriterData{
   static FileWriter fich = null;
   static BufferedReader br = null;
   static File file = null;
-  //Queue para escribir los enemigos abatidos y monedas recogidas hace 5 ticks
-  static Queue<Integer> qEnemies = new LinkedList<Integer>();
-  static Queue<Integer> qCoins = new LinkedList<Integer>();
-  static Queue<Integer> qInstancia= new LinkedList<Integer>();
+  //static Queue<Integer> qEnemies = new LinkedList<Integer>();
+  //static Queue<Integer> qCoins = new LinkedList<Integer>();
+  static Queue<String> qInstancia= new LinkedList<String>();
 
   static int enemies = 0;
   static int coins = 0;
@@ -46,8 +45,10 @@ public class FileWriterData{
       for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
         fich.write("@ATTRIBUTE pos_environment_[" + mx + "_" + my + "] NUMERIC \n");
       }
+
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
+
       fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
       fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
       fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
@@ -60,21 +61,15 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
       fich.write("@ATTRIBUTE timeSpent NUMERIC \n");
       fich.write("@ATTRIBUTE hiddenBlocksFound NUMERIC \n");
+      fich.write("@ATTRIBUTE coinsInScreen NUMERIC \n");
+      fich.write("@ATTRIBUTE blocksInScreen NUMERIC \n");
+      fich.write("@ATTRIBUTE enemiesInScreen NUMERIC \n");
       fich.write("@ATTRIBUTE reward NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE marioStatus_2 NUMERIC \n");// A partir de aquí se repiten movidas
-      fich.write("@ATTRIBUTE marioMode_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioOnGround NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioAbleToJump NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioAbleToShoot NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioCarrying NUMERIC \n");
-      fich.write("@ATTRIBUTE killsTotal_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByFire_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByStomp_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByShell_2 NUMERIC \n");
-      fich.write("@ATTRIBUTE timeLeft_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
+
       fich.write("\n@data \n");
     }
     catch(IOException e){
@@ -104,6 +99,8 @@ public class FileWriterData{
       instancia[mz] = String.valueOf(dataMatrix[mx]);
       mz++;
     }
+
+    //qInstancia.add();
 
     //Escribir en el fichero toda una instacia
     try{
