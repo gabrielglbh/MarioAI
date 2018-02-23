@@ -47,6 +47,19 @@ public class FileWriterData{
       }
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
+      fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
+      fich.write("@ATTRIBUTE killsByStomp NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal NUMERIC \n");
+      fich.write("@ATTRIBUTE marioMode NUMERIC \n");
+      fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
+      fich.write("@ATTRIBUTE mushroomsDevoured NUMERIC \n");
+      fich.write("@ATTRIBUTE coinsGained NUMERIC \n");
+      fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
+      fich.write("@ATTRIBUTE timeSpent NUMERIC \n");
+      fich.write("@ATTRIBUTE hiddenBlocksFound NUMERIC \n");
+      fich.write("@ATTRIBUTE reward NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
       fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
@@ -62,20 +75,6 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
-      fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
-      fich.write("@ATTRIBUTE killsByStomp NUMERIC \n");
-      fich.write("@ATTRIBUTE killsTotal NUMERIC \n");
-      fich.write("@ATTRIBUTE marioMode NUMERIC \n");
-      fich.write("@ATTRIBUTE marioStatus NUMERIC \n");
-      fich.write("@ATTRIBUTE mushroomsDevoured NUMERIC \n");
-      fich.write("@ATTRIBUTE coinsGained NUMERIC \n");
-      fich.write("@ATTRIBUTE timeLeft NUMERIC \n");
-      fich.write("@ATTRIBUTE timeSpent NUMERIC \n");
-      fich.write("@ATTRIBUTE hiddenBlocksFound NUMERIC \n");
-      fich.write("@ATTRIBUTE reward NUMERIC \n");
-      fich.write("@ATTRIBUTE classInstancia NUMERIC \n");
       fich.write("\n@data \n");
     }
     catch(IOException e){
@@ -85,9 +84,9 @@ public class FileWriterData{
 
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
-  public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int classWeka, int tick){
+  public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick){
 
-    length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length+1;
+    length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length;
     String[] instancia = new String[length_instance];
 
     //Meter todo en matriz instancia
@@ -105,9 +104,6 @@ public class FileWriterData{
       instancia[mz] = String.valueOf(dataMatrix[mx]);
       mz++;
     }
-
-    //CLASSWEKA ESTÁ EN instancia[378]
-    instancia[mz] = String.valueOf(classWeka);
 
     //Escribir en el fichero toda una instacia
     try{
