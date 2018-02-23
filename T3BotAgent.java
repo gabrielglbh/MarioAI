@@ -199,7 +199,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
                 dataMatrix[i] = copy[j];
             }
         }
-        
+
         tick++;
         FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }

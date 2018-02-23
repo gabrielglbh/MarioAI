@@ -15,8 +15,7 @@ public class FileWriterData{
   static FileWriter fich = null;
   static BufferedReader br = null;
   static File file = null;
-  //static Queue<Integer> qEnemies = new LinkedList<Integer>();
-  //static Queue<Integer> qCoins = new LinkedList<Integer>();
+
   static Queue<String> qInstancia= new LinkedList<String>();
 
   static int enemies = 0;
@@ -116,20 +115,6 @@ public class FileWriterData{
           if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
           else fich.write(instancia[mz] + " \n");
         }
-
-          //Añadir los enemigos
-        //  qEnemies.add(dataMatrix[8]);
-          //Añadir las monedas
-        //  qCoins.add(dataMatrix[23]);
-        //}
-
-        //Si estamos en el sexto tick de juego, empieza a poner valores de hace 5 ticks
-        // if(tick >= 6){
-        //   //Eliminar y mostrar la head de la cola, LRI
-        //   enemies = qEnemies.poll();
-        //   coins = qCoins.poll();
-        //   fich.write(enemies + ", " + coins + ", ");
-        // }
 
         fich.close();
         mz = 0;
