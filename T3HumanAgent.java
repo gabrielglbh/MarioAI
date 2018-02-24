@@ -47,6 +47,10 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     private boolean[] Action    = null;
     private String Name         = "HumanAgent";
 
+    int coinsInScreen = 0;
+    int blocksInScreen = 0;
+    int enemiesInScreen = 0;
+
     // NUEVO ATRIBUTO: hemos añadido tick (para escribir en el archivo la info de hace 5 ticks)
     int tick;
 
@@ -68,13 +72,35 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     @Override
     public void integrateObservation(Environment environment)
     {
-    	int[] dataMatrix = new int[27]; // Matriz de información de la partida en cada tick
+    	int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
+      coinsInScreen = 0;
+      blocksInScreen = 0;
+      enemiesInScreen = 0;
 
     	// Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
         // escena y los enemigos.
     	byte[][] envi;
     	envi = environment.getMergedObservationZZ(1, 1);
+      for (int mx = 0; mx < envi.length; mx++) {
+          //System.out.print(mx + ": [");
+          for (int my = 0; my < envi[mx].length; my++) {
+              //Coins on screen
+              if(envi[mx][my] == 2) coinsInScreen++;
+              //If blocks
+              if(envi[mx][my] == -22 || envi[mx][my] == -60 || envi[mx][my] == -80 ||
+                  envi[mx][my] == -62 || envi[mx][my] == -24 || envi[mx][my] == -85)
+                  blocksInScreen++;
+              //If enemies
+              if(envi[mx][my] == 1 || envi[mx][my] == 80 || envi[mx][my] == 95 ||
+                  envi[mx][my] == 82 || envi[mx][my] == 97 || envi[mx][my] == 81 ||
+                  envi[mx][my] == 96 || envi[mx][my] == 84 || envi[mx][my] == 93 ||
+                  envi[mx][my] == 99 || envi[mx][my] == 91 || envi[mx][my] == 13 ||
+                  envi[mx][my] == -42)
+                  enemiesInScreen++;
+          //System.out.println("]");
+          }
+      }
 
     	// Posicion de Mario utilizando las coordenadas del sistema
     	float[] posMario;
@@ -87,29 +113,40 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
           dataMatrix[mx] = posMarioEgo[mx];
         }
 
-        // Estado de mario
-        // marioStatus, marioMode, isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), isMarioAbleToShoot (1 o 0),
-        // isMarioCarrying (1 o 0), killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
-        int[] marioState;
-        marioState = environment.getMarioState();
-        for (int mx = 0; mx < marioState.length; mx++){
-          dataMatrix[mx+posMarioEgo.length] = marioState[mx];
-        }
-
         // Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
         // marioStatus, mushroomsDevoured, coinsGained, timeLeft, timeSpent, hiddenBlocksFound
         int[] infoEvaluacion;
         infoEvaluacion = environment.getEvaluationInfoAsInts();
         for (int mx = 0; mx < infoEvaluacion.length; mx++){
-          dataMatrix[mx+posMarioEgo.length+marioState.length] = infoEvaluacion[mx];
+          //System.out.print(infoEvaluacion[mx] + " ");
+          dataMatrix[mx+posMarioEgo.length] = infoEvaluacion[mx];
         }
 
+        // Informacion del refuerzo/puntuacion que ha obtenido Mario. Nos puede servir para determinar lo bien o mal que lo esta haciendo.
+        // Por defecto este valor engloba: reward for coins, killed creatures, cleared dead-ends, bypassed gaps, hidden blocks found
+        //System.out.println("\nREFUERZO");
         int reward = environment.getIntermediateReward();
-        dataMatrix[26] = reward;
+
+        dataMatrix[16] = coinsInScreen;
+        dataMatrix[17] = blocksInScreen;
+        dataMatrix[18] = enemiesInScreen;
+        dataMatrix[19] = reward;
+
+        //Mover distancePassedPhys a la ultima posicion de dataMatrix
+        /*12 es el numero de posiciones a rotar la matriz de dataMatrix para que distancePassedPhys quede
+          en últime posicion*/
+        int offset = dataMatrix.length - 16 % dataMatrix.length;
+        if (offset > 0) {
+            int[] copy = dataMatrix.clone();
+            for (int i = 0; i < dataMatrix.length; ++i) {
+                int j = (i + offset) % dataMatrix.length;
+                dataMatrix[i] = copy[j];
+            }
+        }
 
         tick++;
-        //FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     @Override

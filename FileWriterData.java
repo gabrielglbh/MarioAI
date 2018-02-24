@@ -16,13 +16,16 @@ public class FileWriterData{
   static BufferedReader br = null;
   static File file = null;
 
-  static Queue<String> qInstancia= new LinkedList<String>();
+  //3000 ticks como maximo, luego si sobra espacio se reajusta
+  static LinkedList<String>[] future = new LinkedList[3000];
+  static String[][]  futureAttributes = new String[3000][6];
 
   static int enemies = 0;
   static int coins = 0;
   static char b;
   static int mz = 0;
   static int length_instance = 0;
+  static int count = 0;
 
   public FileWriterData(){}
 
@@ -99,7 +102,51 @@ public class FileWriterData{
       mz++;
     }
 
-    //qInstancia.add();
+    /*
+      Monedas instancia[371]
+      Enemigos instancia[367]
+    */
+
+    // Make sure the list is initialized before adding to it
+    if(future[tick] == null) {
+       future[tick] = new LinkedList<String>();
+    }
+
+    /*
+      TODO: para calcular las monedas recogidas en los próximos 12 ticks habrá que
+      restar el total de monedas hasta el tick n + 12 menos el total de monedas
+      hasta el tick actual n. Podría ser útil generalizar esta operación para un
+      número arbitrario de ticks futuros.
+    */
+
+    /*
+      Se añade monedas y enemigos de cada tick desde el principio, por cada tick hay una LinkedList
+      de dos posiciones (enemigos y monedas) en el tick.
+      Así, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas mató y recogió respectivamente.
+    */
+    future[tick].add(instancia[371]);
+    future[tick].add(instancia[367]);
+
+    if(tick >= 24){
+      int mx = 0;
+      /*count = tick del pasado
+        cuando el tick sea igual a 24 o mayor, futureAttributes se rellenará
+        con los valores de los n+6, n+12 y n+24 Atributos de future[].
+
+        count se va a actualizando a medida que se accede a este if
+        para emular a los primeros ticks y añadirles dichos atributos.
+      */
+      futureAttributes[count][mx] = future[6+count].getFirst(); //Monedas
+      futureAttributes[count][mx+1] = future[6+count].getLast(); //Enemigos
+
+      futureAttributes[count][mx+2] = future[12+count].getFirst(); //Monedas
+      futureAttributes[count][mx+3] = future[12+count].getLast(); //Enemigos
+
+      futureAttributes[count][mx+4] = future[24+count].getFirst(); //Monedas
+      futureAttributes[count][mx+5] = future[24+count].getLast(); //Enemigos
+
+      count++;
+    }
 
     //Escribir en el fichero toda una instacia
     try{

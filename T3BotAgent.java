@@ -160,8 +160,8 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         // marioStatus, marioMode, isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), isMarioAbleToShoot (1 o 0),
         // isMarioCarrying (1 o 0), killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
         //System.out.println("\nESTADO MARIO");
-        int[] marioState;
-        marioState = environment.getMarioState();
+        //int[] marioState;
+        //marioState = environment.getMarioState();
         //for (int mx = 0; mx < marioState.length; mx++){
           //System.out.print(marioState[mx] + " ");
           //dataMatrix[mx+posMarioEgo.length] = marioState[mx];
