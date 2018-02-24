@@ -8,10 +8,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import java.nio.file.Files;
 import java.util.*;
 
@@ -20,7 +16,6 @@ public class FileWriterData{
   static FileWriter fich = null;
   static BufferedReader br = null;
   static File file = null;
-  static RandomAccessFile raf = null;
 
   //3000 ticks como maximo, luego si sobra espacio se reajusta
   static LinkedList<String>[] future = new LinkedList[3000];
@@ -35,6 +30,7 @@ public class FileWriterData{
   static int mz = 0;
   static int length_instance = 0;
   static int count = 0;
+  static int auxCounter = 0;
 
   public FileWriterData(){}
 
@@ -79,14 +75,14 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
-      /*
-        fich.write("@ATTRIBUTE coinsGained_tick_n6 NUMERIC \n");
-        fich.write("@ATTRIBUTE killsTotal_tick_n6 NUMERIC \n");
-        fich.write("@ATTRIBUTE coinsGained_tick_n12 NUMERIC \n");
-        fich.write("@ATTRIBUTE killsTotal_tick_n12 NUMERIC \n");
-        fich.write("@ATTRIBUTE coinsGained_tick_n24 NUMERIC \n");
-        fich.write("@ATTRIBUTE killsTotal_tick_n24 NUMERIC \n");
-      */
+
+      fich.write("@ATTRIBUTE coinsGained_tick_n6 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal_tick_n6 NUMERIC \n");
+      fich.write("@ATTRIBUTE coinsGained_tick_n12 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal_tick_n12 NUMERIC \n");
+      fich.write("@ATTRIBUTE coinsGained_tick_n24 NUMERIC \n");
+      fich.write("@ATTRIBUTE killsTotal_tick_n24 NUMERIC \n");
+
       fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
 
       fich.write("\n@data \n");
@@ -172,7 +168,6 @@ public class FileWriterData{
           fich = new FileWriter("ejemplos.arff",true);
           file = new File("ejemplos.arff");
           br = new BufferedReader(new FileReader("ejemplos.arff"));
-          raf = new RandomAccessFile("ejemplos.arff","rw");
 
           //Establecer Header de fichero arff únicamente en el primer tick
           //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
@@ -180,6 +175,42 @@ public class FileWriterData{
 
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
           String[] instanciaActual = myInstance.poll();
+          String[] instanciaCompleta = new String[389];
+
+          //Establcemos la instanciaCompleta...
+          for(int a = 0; a < instanciaActual.length; a++){
+            //Mientras que no estemos en la ultima posicion ir añadiendo atributos
+            if(a != instanciaActual.length-1) instanciaCompleta[a] = instanciaActual[a];
+            /*
+              Si estamos en la última posicion de la instanciaActual, añadir
+              loa futureAttributes a la instanciaCompleta y por último añadir
+              la clase distancePassedPhys.
+            */
+            else{
+              for(int my = 0; my < 6; my++){
+
+                /**************************/
+                /* SIEMPRE IMPRIME AL PRINCIPIO
+                  0, null, null, null, null, null
+                  0, 0, null, null, null, null
+                  0, 0, 0, null, null, null
+                  0, 0, 0, 0, null, null
+                  0, 0, 0, 0, 0, null
+                  0, 0, 0, 0, 0, 1
+
+                    Y SE QUEDA ASÍ 
+                */
+                /**************************/
+
+                instanciaCompleta[a+my] = futureAttributes[auxCounter][my];
+                auxCounter++;
+              }
+              //Añadir la clase distancePassedPhys a la instanciaCompleta
+              instanciaCompleta[instanciaCompleta.length-1] = instanciaActual[instanciaActual.length-1];
+              auxCounter = 0; //Reset
+              break;
+            }
+          }
 
           /*
             instanciaActual representa la primera instancia a escribir...
@@ -188,21 +219,15 @@ public class FileWriterData{
                                     ...
             futureAttributes representa los atributos correspondientes a
             instanciaActual en los ticks n+6, n+12, n+24.
+
+            instanciaCompleta representa toda la instancia con los futureAttributes
+            ya metidos en ella.
           */
 
-          for(mz = 0; mz < length_instance; mz++){
-            if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
-            else fich.write(instancia[mz] + " \n");
+          for(mz = 0; mz < instanciaCompleta.length; mz++){
+            if(mz != instanciaCompleta.length-1) fich.write(instanciaCompleta[mz] + ", ");
+            else fich.write(instanciaCompleta[mz] + " \n");
           }
-
-          /*
-            TODO: Acceder al último digito escrito del fichero y dirigir el puntero
-            a la primera coma ',' para ahí escribir los futureAttributes, dejando
-            como último atributo distancePassedPhys.
-
-            raf = RandomAccessFile
-          */
-          //raf.seek();
 
           fich.close();
 
