@@ -127,6 +127,7 @@ public class FileWriterData{
     future[tick].add(instancia[371]);
     future[tick].add(instancia[367]);
 
+    //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick >= 24){
       int mx = 0;
       /*count = tick del pasado
@@ -146,28 +147,28 @@ public class FileWriterData{
       futureAttributes[count][mx+5] = future[24+count].getLast(); //Enemigos
 
       count++;
-    }
 
-    //Escribir en el fichero toda una instacia
-    try{
-        fich = new FileWriter("ejemplos.arff",true);
-        file = new File("ejemplos.arff");
-        br = new BufferedReader(new FileReader("ejemplos.arff"));
+      //Escribir en el fichero toda una instacia
+      try{
+          fich = new FileWriter("ejemplos.arff",true);
+          file = new File("ejemplos.arff");
+          br = new BufferedReader(new FileReader("ejemplos.arff"));
 
-        //Establecer Header de fichero arff únicamente en el primer tick
-        //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
-        if(br.readLine() == null || !file.exists()) init_arff(envi);
+          //Establecer Header de fichero arff únicamente en el primer tick
+          //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
+          if(br.readLine() == null || !file.exists()) init_arff(envi);
 
-        for(mz = 0; mz < length_instance; mz++){
-          if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
-          else fich.write(instancia[mz] + " \n");
-        }
+          for(mz = 0; mz < length_instance; mz++){
+            if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
+            else fich.write(instancia[mz] + " \n");
+          }
 
-        fich.close();
-        mz = 0;
-    }
-    catch(IOException e){
-        e.printStackTrace(System.out);
+          fich.close();
+          mz = 0;
+      }
+      catch(IOException e){
+          e.printStackTrace(System.out);
+      }
     }
   }
 }
