@@ -6,6 +6,11 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.RandomAccessFile;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import java.nio.file.Files;
 import java.util.*;
@@ -15,10 +20,14 @@ public class FileWriterData{
   static FileWriter fich = null;
   static BufferedReader br = null;
   static File file = null;
+  static RandomAccessFile raf = null;
 
   //3000 ticks como maximo, luego si sobra espacio se reajusta
   static LinkedList<String>[] future = new LinkedList[3000];
   static String[][]  futureAttributes = new String[3000][6];
+
+  //Queue para luego imprimir los ticks con su debido orden
+  static Queue<String[]> myInstance = new LinkedList<String[]>();
 
   static int enemies = 0;
   static int coins = 0;
@@ -70,6 +79,14 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE posMarioEgo_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
+      /*
+        fich.write("@ATTRIBUTE coinsGained_tick_n6 NUMERIC \n");
+        fich.write("@ATTRIBUTE killsTotal_tick_n6 NUMERIC \n");
+        fich.write("@ATTRIBUTE coinsGained_tick_n12 NUMERIC \n");
+        fich.write("@ATTRIBUTE killsTotal_tick_n12 NUMERIC \n");
+        fich.write("@ATTRIBUTE coinsGained_tick_n24 NUMERIC \n");
+        fich.write("@ATTRIBUTE killsTotal_tick_n24 NUMERIC \n");
+      */
       fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
 
       fich.write("\n@data \n");
@@ -101,6 +118,8 @@ public class FileWriterData{
       instancia[mz] = String.valueOf(dataMatrix[mx]);
       mz++;
     }
+
+    myInstance.add(instancia);
 
     /*
       Monedas instancia[371]
@@ -153,22 +172,46 @@ public class FileWriterData{
           fich = new FileWriter("ejemplos.arff",true);
           file = new File("ejemplos.arff");
           br = new BufferedReader(new FileReader("ejemplos.arff"));
+          raf = new RandomAccessFile("ejemplos.arff","rw");
 
           //Establecer Header de fichero arff únicamente en el primer tick
           //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
           if(br.readLine() == null || !file.exists()) init_arff(envi);
+
+          //Sacar el head-tick de la cola y concatenarlo con futureAttributes
+          String[] instanciaActual = myInstance.poll();
+
+          /*
+            instanciaActual representa la primera instancia a escribir...
+            En el tick = 24, instanciaActual es la instancia del tick = 1
+            En el tick = 25, instanciaActual es la instancia del tick = 2
+                                    ...
+            futureAttributes representa los atributos correspondientes a
+            instanciaActual en los ticks n+6, n+12, n+24.
+          */
 
           for(mz = 0; mz < length_instance; mz++){
             if(mz != length_instance-1) fich.write(instancia[mz] + ", ");
             else fich.write(instancia[mz] + " \n");
           }
 
+          /*
+            TODO: Acceder al último digito escrito del fichero y dirigir el puntero
+            a la primera coma ',' para ahí escribir los futureAttributes, dejando
+            como último atributo distancePassedPhys.
+
+            raf = RandomAccessFile
+          */
+          //raf.seek();
+
           fich.close();
-          mz = 0;
+
       }
       catch(IOException e){
           e.printStackTrace(System.out);
       }
     }
+
+    mz = 0;
   }
 }
