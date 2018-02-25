@@ -30,7 +30,6 @@ public class FileWriterData{
   static int mz = 0; // Índice para recorrer las posiciones de instancia, tanto para dar valor como para leer
   static int length_instance = 0; // Vestigial, se puede quitar (no me atrevo, no sea que la líe)
   static int count = 0;
-  //static int auxCounter = 0; Sirve el mismo propósito que count, explicacion abajo
 
   public FileWriterData(){}
 
