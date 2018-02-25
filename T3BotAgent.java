@@ -47,6 +47,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
     //int mx;
     int[] dataMatrix = new int[20]; // Matriz de informacion de la partida en cada tick
     byte[][] envi = new byte[19][19]; // Matriz del entorno de Mario (el grid)
+    float[] posMario;
     int jumpButtonPressed = -1;
     int coinsInScreen = 0;
     int blocksInScreen = 0;
@@ -142,7 +143,6 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
 
         // Posicion de Mario utilizando las coordenadas del sistema
         //System.out.println("POSICION MARIO");
-        float[] posMario;
         posMario = environment.getMarioFloatPos();
         //for (mx = 0; mx < posMario.length; mx++)
           //System.out.print(posMario[mx] + " ");
@@ -201,7 +201,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         }
 
         tick++;
-        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
+        //FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     public boolean[] getAction() {
@@ -275,7 +275,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
       	  jumpButtonPressed = -1;
         }
 
-
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, action, tick);
 
         return action;
     }
