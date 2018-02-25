@@ -55,6 +55,13 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
 
+      fich.write("@ATTRIBUTE KEY_LEFT NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_RIGHT NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_DOWN NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_JUMP NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_SPEED NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_UP NUMERIC \n");
+
       fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
       fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
       fich.write("@ATTRIBUTE killsByShell NUMERIC \n");
@@ -93,9 +100,9 @@ public class FileWriterData{
 
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
-  public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick){
+  public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, boolean[] action, int tick){
 
-    length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length;
+    length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length + action.length;
     String[] instancia = new String[length_instance];
 
     //Meter todo en matriz instancia
@@ -109,6 +116,11 @@ public class FileWriterData{
       mz++;
     }
 
+    for(int mx = 0; mx < action.length; mx++){
+      instancia[mz] = String.valueOf(action[mx]);
+      mz++;
+    }
+
     for(int mx = 0; mx < dataMatrix.length; mx++){
       instancia[mz] = String.valueOf(dataMatrix[mx]);
       mz++;
@@ -117,8 +129,8 @@ public class FileWriterData{
     myInstance.add(instancia);
 
     /*
-      Monedas instancia[371]
-      Enemigos instancia[367]
+      Monedas instancia[377]
+      Enemigos instancia[373]
     */
 
     /*
@@ -126,8 +138,8 @@ public class FileWriterData{
       de dos posiciones (enemigos y monedas) en el tick.
       AsÃ­, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas matÃ³ y recogiÃ³ respectivamente.
     */
-    future[tick][0] = instancia[371]; 
-    future[tick][1] = instancia[367];
+    future[tick][0] = instancia[377];
+    future[tick][1] = instancia[373];
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick >= 24){
@@ -162,7 +174,7 @@ public class FileWriterData{
 
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
           String[] instanciaActual = myInstance.poll();
-          String[] instanciaCompleta = new String[389];
+          String[] instanciaCompleta = new String[395];
 
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
