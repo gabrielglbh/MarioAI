@@ -1,5 +1,5 @@
 package ch.idsia.agents.controllers;
- 
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
@@ -142,7 +142,7 @@ public class FileWriterData{
     future[tick][1] = instancia[373];
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
-    if(tick >= 24){
+    if(tick > 24){
       int mx = 0;
       /*count = tick del pasado
         cuando el tick sea igual a 24 o mayor, futureAttributes se rellenarÃ¡
@@ -151,16 +151,16 @@ public class FileWriterData{
         count se va a actualizando a medida que se accede a este if
         para emular a los primeros ticks y aÃ±adirles dichos atributos.
       */
-      futureAttributes[count][mx] = future[6+count][0]; //Monedas
-      futureAttributes[count][mx+1] = future[6+count][1]; //Enemigos
+      
+      /* Aquí se calcula el numero de monedas/bichos que se consiguen en los próximos 6, 12 y 24 ticks*/
+      futureAttributes[count][mx] = String.valueOf( Integer.parseInt(future[6+count+1][0]) - Integer.parseInt(future[count+1][0]) ); //Monedas
+      futureAttributes[count][mx+1] = String.valueOf( Integer.parseInt(future[6+count+1][1]) - Integer.parseInt(future[count+1][1]) ); //Enemigos
 
-      futureAttributes[count][mx+2] = future[12+count][0]; //Monedas
-      futureAttributes[count][mx+3] = future[12+count][1]; //Enemigos
+      futureAttributes[count][mx+2] = String.valueOf( Integer.parseInt(future[12+count+1][0]) - Integer.parseInt(future[count+1][0]) ); //Monedas
+      futureAttributes[count][mx+3] = String.valueOf( Integer.parseInt(future[12+count+1][1]) - Integer.parseInt(future[count+1][1]) ); //Enemigos
 
-      futureAttributes[count][mx+4] = future[24+count][0]; //Monedas
-      futureAttributes[count][mx+5] = future[24+count][1]; //Enemigos
-
-
+      futureAttributes[count][mx+4] = String.valueOf( Integer.parseInt(future[24+count+1][0]) - Integer.parseInt(future[count+1][0]) ); //Monedas
+      futureAttributes[count][mx+5] = String.valueOf( Integer.parseInt(future[24+count+1][1]) - Integer.parseInt(future[count+1][1]) ); //Enemigos
 
       //Escribir en el fichero toda una instacia
       try {
@@ -207,7 +207,7 @@ public class FileWriterData{
             instanciaCompleta representa toda la instancia con los futureAttributes
             ya metidos en ella.
           */
-
+          
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
             if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ", ");
             else fich.write(instanciaCompleta[ii] + " \n");

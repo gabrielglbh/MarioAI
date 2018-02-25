@@ -70,9 +70,10 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     public void setName(String name) { Name = name; }
 
     @Override
-    public boolean[] getAction() {
-      FileWriterData.writeOnFile(posMario, dataMatrix, envi, Action, tick);
-      return Action;
+    public boolean[] getAction() { 
+    	//System.out.println("\nHola actuo cada tick :D");
+    	FileWriterData.writeOnFile(posMario, dataMatrix, envi, Action, tick);
+    	return Action; 
     }
 
     @Override
@@ -209,6 +210,7 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
                 Action[Mario.KEY_SPEED] = isPressed;
                 break;
         }
+        
     }
 
 }
