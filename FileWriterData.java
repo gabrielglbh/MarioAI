@@ -122,19 +122,12 @@ public class FileWriterData{
     */
 
     /*
-      TODO: para calcular las monedas recogidas en los próximos 12 ticks habrá que
-      restar el total de monedas hasta el tick n + 12 menos el total de monedas
-      hasta el tick actual n. PodriÌ�a ser uÌ�til generalizar esta operacioÌ�n para un
-      nuÌ�mero arbitrario de ticks futuros.
-    */
-
-    /*
       Se aÃ±ade monedas y enemigos de cada tick desde el principio, por cada tick hay una LinkedList
       de dos posiciones (enemigos y monedas) en el tick.
       AsÃ­, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas matÃ³ y recogiÃ³ respectivamente.
     */
-    future[tick][0] = instancia[371]; // ####YO: cambiar esta mierda por matriz de String y
-    future[tick][1] = instancia[367]; // ####YO: a tomar por sacos
+    future[tick][0] = instancia[371]; 
+    future[tick][1] = instancia[367];
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick >= 24){
