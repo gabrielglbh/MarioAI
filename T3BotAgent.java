@@ -45,7 +45,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
      * (para que no vaya como pollo sin cabeza)
      */
     //int mx;
-    int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
+    int[] dataMatrix = new int[20]; // Matriz de informacion de la partida en cada tick
     byte[][] envi = new byte[19][19]; // Matriz del entorno de Mario (el grid)
     int jumpButtonPressed = -1;
     int coinsInScreen = 0;
@@ -124,13 +124,13 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
                 //System.out.print(env[mx][my] + " ");
                 envi[mx][my] = env[mx][my];
                 //Coins on screen
-                if(envi[mx][my] == 2) coinsInScreen++;
+                if (envi[mx][my] == 2) coinsInScreen++;
                 //If blocks
-                if(envi[mx][my] == -22 || envi[mx][my] == -60 || envi[mx][my] == -80 ||
+                if (envi[mx][my] == -22 || envi[mx][my] == -60 || envi[mx][my] == -80 ||
                     envi[mx][my] == -62 || envi[mx][my] == -24 || envi[mx][my] == -85)
                     blocksInScreen++;
                 //If enemies
-                if(envi[mx][my] == 1 || envi[mx][my] == 80 || envi[mx][my] == 95 ||
+                if (envi[mx][my] == 1 || envi[mx][my] == 80 || envi[mx][my] == 95 ||
                     envi[mx][my] == 82 || envi[mx][my] == 97 || envi[mx][my] == 81 ||
                     envi[mx][my] == 96 || envi[mx][my] == 84 || envi[mx][my] == 93 ||
                     envi[mx][my] == 99 || envi[mx][my] == 91 || envi[mx][my] == 13 ||
@@ -190,7 +190,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
 
         //Mover distancePassedPhys a la ultima posicion de dataMatrix
         /*12 es el numero de posiciones a rotar la matriz de dataMatrix para que distancePassedPhys quede
-          en últime posicion*/
+          en ultima posicion*/
         int offset = dataMatrix.length - 16 % dataMatrix.length;
         if (offset > 0) {
             int[] copy = dataMatrix.clone();

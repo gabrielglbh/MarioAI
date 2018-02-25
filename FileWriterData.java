@@ -27,10 +27,10 @@ public class FileWriterData{
   static int enemies = 0;
   static int coins = 0;
   static char b;
-  static int mz = 0;
-  static int length_instance = 0;
+  static int mz = 0; // Índice para recorrer las posiciones de instancia, tanto para dar valor como para leer
+  static int length_instance = 0; // Vestigial, se puede quitar (no me atrevo, no sea que la líe)
   static int count = 0;
-  static int auxCounter = 0;
+  //static int auxCounter = 0; Sirve el mismo propósito que count, explicacion abajo
 
   public FileWriterData(){}
 
@@ -96,7 +96,7 @@ public class FileWriterData{
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, int tick){
 
-    length_instance = envi.length*envi[0].length+posMario.length+dataMatrix.length;
+    length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length;
     String[] instancia = new String[length_instance];
 
     //Meter todo en matriz instancia
@@ -128,29 +128,29 @@ public class FileWriterData{
     }
 
     /*
-      TODO: para calcular las monedas recogidas en los próximos 12 ticks habrá que
+      TODO: para calcular las monedas recogidas en los próximos 12 ticks habrá que
       restar el total de monedas hasta el tick n + 12 menos el total de monedas
-      hasta el tick actual n. Podría ser útil generalizar esta operación para un
-      número arbitrario de ticks futuros.
+      hasta el tick actual n. PodriÌ�a ser uÌ�til generalizar esta operacioÌ�n para un
+      nuÌ�mero arbitrario de ticks futuros.
     */
 
     /*
-      Se añade monedas y enemigos de cada tick desde el principio, por cada tick hay una LinkedList
+      Se aÃ±ade monedas y enemigos de cada tick desde el principio, por cada tick hay una LinkedList
       de dos posiciones (enemigos y monedas) en el tick.
-      Así, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas mató y recogió respectivamente.
+      AsÃ­, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas matÃ³ y recogiÃ³ respectivamente.
     */
-    future[tick].add(instancia[371]);
-    future[tick].add(instancia[367]);
+    future[tick].add(instancia[371]); // ####YO: cambiar esta mierda por matriz de String y
+    future[tick].add(instancia[367]); // ####YO: a tomar por sacos
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick >= 24){
       int mx = 0;
       /*count = tick del pasado
-        cuando el tick sea igual a 24 o mayor, futureAttributes se rellenará
+        cuando el tick sea igual a 24 o mayor, futureAttributes se rellenarÃ¡
         con los valores de los n+6, n+12 y n+24 Atributos de future[].
 
         count se va a actualizando a medida que se accede a este if
-        para emular a los primeros ticks y añadirles dichos atributos.
+        para emular a los primeros ticks y aÃ±adirles dichos atributos.
       */
       futureAttributes[count][mx] = future[6+count].getFirst(); //Monedas
       futureAttributes[count][mx+1] = future[6+count].getLast(); //Enemigos
@@ -161,16 +161,16 @@ public class FileWriterData{
       futureAttributes[count][mx+4] = future[24+count].getFirst(); //Monedas
       futureAttributes[count][mx+5] = future[24+count].getLast(); //Enemigos
 
-      count++;
+      
 
       //Escribir en el fichero toda una instacia
-      try{
+      try {
           fich = new FileWriter("ejemplos.arff",true);
           file = new File("ejemplos.arff");
           br = new BufferedReader(new FileReader("ejemplos.arff"));
 
-          //Establecer Header de fichero arff únicamente en el primer tick
-          //Si no existe el fichero o existe y estÃ¡ vacÃ­o...
+          //Establecer Header de fichero arff Ãºnicamente en el primer tick
+          //Si no existe el fichero o existe y estÃƒÂ¡ vacÃƒÂ­o...
           if(br.readLine() == null || !file.exists()) init_arff(envi);
 
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
@@ -179,18 +179,17 @@ public class FileWriterData{
 
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
-            //Mientras que no estemos en la ultima posicion ir añadiendo atributos
+            //Mientras que no estemos en la ultima posicion ir aÃ±adiendo atributos
             if(a != instanciaActual.length-1) instanciaCompleta[a] = instanciaActual[a];
             /*
-              Si estamos en la última posicion de la instanciaActual, añadir
-              loa futureAttributes a la instanciaCompleta y por último añadir
+              Si estamos en la Ãºltima posicion de la instanciaActual, aÃ±adir
+              loa futureAttributes a la instanciaCompleta y por Ãºltimo aÃ±adir
               la clase distancePassedPhys.
             */
             else{
               for(int my = 0; my < 6; my++){
 
-                /**************************/
-                /* SIEMPRE IMPRIME AL PRINCIPIO
+                /* SIEMPRE IMPRIME AL PRINCIPIO (en las 6 primeras iteraciones)
                   0, null, null, null, null, null
                   0, 0, null, null, null, null
                   0, 0, 0, null, null, null
@@ -198,16 +197,17 @@ public class FileWriterData{
                   0, 0, 0, 0, 0, null
                   0, 0, 0, 0, 0, 1
 
-                    Y SE QUEDA ASÍ 
+                    Y SE QUEDA ASÃ� 
                 */
-                /**************************/
 
-                instanciaCompleta[a+my] = futureAttributes[auxCounter][my];
-                auxCounter++;
+                //instanciaCompleta[a+my] = futureAttributes[auxCounter][my];
+                //auxCounter++;
+            	//auxCounter sobraba y además se estaba actualizando cuando no tocaba, de ahí los valores raros esos del null
+                instanciaCompleta[a+my] = futureAttributes[count][my];
               }
-              //Añadir la clase distancePassedPhys a la instanciaCompleta
+              //AÃ±adir la clase distancePassedPhys a la instanciaCompleta
               instanciaCompleta[instanciaCompleta.length-1] = instanciaActual[instanciaActual.length-1];
-              auxCounter = 0; //Reset
+              //auxCounter++; Aquí es donde se debería actualizar //= 0; //Reset
               break;
             }
           }
@@ -224,19 +224,19 @@ public class FileWriterData{
             ya metidos en ella.
           */
 
-          for(mz = 0; mz < instanciaCompleta.length; mz++){
-            if(mz != instanciaCompleta.length-1) fich.write(instanciaCompleta[mz] + ", ");
-            else fich.write(instanciaCompleta[mz] + " \n");
+          for(int ii = 0; ii < instanciaCompleta.length; ii++){
+            if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ", ");
+            else fich.write(instanciaCompleta[ii] + " \n");
           }
 
           fich.close();
+          count++; // Se actualiza el índice de ticks de future y futureAttrib
 
       }
       catch(IOException e){
           e.printStackTrace(System.out);
       }
-    }
-
+    }    
     mz = 0;
   }
 }
