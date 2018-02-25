@@ -55,12 +55,12 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
 
-      fich.write("@ATTRIBUTE KEY_LEFT NUMERIC \n");
-      fich.write("@ATTRIBUTE KEY_RIGHT NUMERIC \n");
-      fich.write("@ATTRIBUTE KEY_DOWN NUMERIC \n");
-      fich.write("@ATTRIBUTE KEY_JUMP NUMERIC \n");
-      fich.write("@ATTRIBUTE KEY_SPEED NUMERIC \n");
-      fich.write("@ATTRIBUTE KEY_UP NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_DOWN {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_JUMP {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_SPEED {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_UP {true, false} \n");
 
       fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
       fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
