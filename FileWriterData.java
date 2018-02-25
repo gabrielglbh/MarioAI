@@ -183,21 +183,6 @@ public class FileWriterData{
             */
             else{
               for(int my = 0; my < 6; my++){
-
-                /* SIEMPRE IMPRIME AL PRINCIPIO (en las 6 primeras iteraciones)
-                  0, null, null, null, null, null
-                  0, 0, null, null, null, null
-                  0, 0, 0, null, null, null
-                  0, 0, 0, 0, null, null
-                  0, 0, 0, 0, 0, null
-                  0, 0, 0, 0, 0, 1
-
-                    Y SE QUEDA ASÃ�
-                */
-
-                //instanciaCompleta[a+my] = futureAttributes[auxCounter][my];
-                //auxCounter++;
-            	//auxCounter sobraba y además se estaba actualizando cuando no tocaba, de ahí los valores raros esos del null
                 instanciaCompleta[a+my] = futureAttributes[count][my];
               }
               //AÃ±adir la clase distancePassedPhys a la instanciaCompleta
