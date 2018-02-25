@@ -46,6 +46,9 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
 
     private boolean[] Action    = null;
     private String Name         = "HumanAgent";
+    int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
+    byte[][] envi = new byte[19][19];
+    float[] posMario;
 
     int coinsInScreen = 0;
     int blocksInScreen = 0;
@@ -72,7 +75,6 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     @Override
     public void integrateObservation(Environment environment)
     {
-    	int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
       coinsInScreen = 0;
       blocksInScreen = 0;
       enemiesInScreen = 0;
@@ -80,7 +82,6 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     	// Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
         // escena y los enemigos.
-    	byte[][] envi;
     	envi = environment.getMergedObservationZZ(1, 1);
       for (int mx = 0; mx < envi.length; mx++) {
           //System.out.print(mx + ": [");
@@ -103,7 +104,6 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
       }
 
     	// Posicion de Mario utilizando las coordenadas del sistema
-    	float[] posMario;
     	posMario = environment.getMarioFloatPos();
 
     	// Posicion que ocupa Mario en el array anterior
@@ -146,7 +146,7 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
         }
 
         tick++;
-        FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
+        //FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
     @Override
@@ -206,6 +206,7 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
                 Action[Mario.KEY_SPEED] = isPressed;
                 break;
         }
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, Action, tick);
     }
 
 }
