@@ -275,7 +275,18 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
       	  jumpButtonPressed = -1;
         }
 
-        FileWriterData.writeOnFile(posMario, dataMatrix, envi, action, tick);
+        boolean[] aux_action = action.clone();
+
+        int offset = aux_action.length - 2 % aux_action.length;
+        if (offset > 0) {
+            boolean[] copy = aux_action.clone();
+            for (int i = 0; i < aux_action.length; ++i) {
+                int j = (i + offset) % aux_action.length;
+                aux_action[i] = copy[j];
+            }
+        }
+
+        FileWriterData.writeOnFile(posMario, dataMatrix, envi, aux_action, tick);
 
         return action;
     }

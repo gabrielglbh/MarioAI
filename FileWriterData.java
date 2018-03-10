@@ -47,20 +47,16 @@ public class FileWriterData{
   public static void init_arff(byte[][] envi){
     try{
       fich = new FileWriter("ejemplos.arff",true);
-      fich.write("@RELATION Mario_Datos_Ticks\n\n");
+      String callerClass = new Exception().getStackTrace()[2].getClassName();
+      callerClass = callerClass.substring(callerClass.lastIndexOf('.')+1);
+      fich.write("@RELATION " + callerClass + "\n\n");
+
       for(int mx = 0; mx < envi.length; mx++) for(int my = 0; my < envi[mx].length; my++){
         fich.write("@ATTRIBUTE pos_environment_[" + mx + "_" + my + "] NUMERIC \n");
       }
 
       fich.write("@ATTRIBUTE posMario_1 NUMERIC \n");
       fich.write("@ATTRIBUTE posMario_2 NUMERIC \n");
-
-      fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_DOWN {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_JUMP {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_SPEED {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_UP {true, false} \n");
 
       fich.write("@ATTRIBUTE flowersDevoured NUMERIC \n");
       fich.write("@ATTRIBUTE killsByFire NUMERIC \n");
@@ -82,6 +78,14 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE posMarioEgo_2 NUMERIC \n");
       fich.write("@ATTRIBUTE distancePassedCells NUMERIC \n");
 
+      fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
+
+      fich.write("@ATTRIBUTE KEY_SPEED {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_UP {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_DOWN {true, false} \n");
+
       fich.write("@ATTRIBUTE coinsGained_tick_n6 NUMERIC \n");
       fich.write("@ATTRIBUTE killsTotal_tick_n6 NUMERIC \n");
       fich.write("@ATTRIBUTE coinsGained_tick_n12 NUMERIC \n");
@@ -89,7 +93,7 @@ public class FileWriterData{
       fich.write("@ATTRIBUTE coinsGained_tick_n24 NUMERIC \n");
       fich.write("@ATTRIBUTE killsTotal_tick_n24 NUMERIC \n");
 
-      fich.write("@ATTRIBUTE distancePassedPhys NUMERIC \n");
+      fich.write("@ATTRIBUTE KEY_JUMP {true, false} \n");
 
       fich.write("\n@data \n");
     }
@@ -116,13 +120,13 @@ public class FileWriterData{
       mz++;
     }
 
-    for(int mx = 0; mx < action.length; mx++){
-      instancia[mz] = String.valueOf(action[mx]);
+    for(int mx = 0; mx < dataMatrix.length; mx++){
+      instancia[mz] = String.valueOf(dataMatrix[mx]);
       mz++;
     }
 
-    for(int mx = 0; mx < dataMatrix.length; mx++){
-      instancia[mz] = String.valueOf(dataMatrix[mx]);
+    for(int mx = 0; mx < action.length; mx++){
+      instancia[mz] = String.valueOf(action[mx]);
       mz++;
     }
 
@@ -138,8 +142,8 @@ public class FileWriterData{
       de dos posiciones (enemigos y monedas) en el tick.
       AsÃ­, en el tick = 6 (future[6]) sabemos cuantos enemigos y monedas matÃ³ y recogiÃ³ respectivamente.
     */
-    future[tick][0] = instancia[377];
-    future[tick][1] = instancia[373];
+    future[tick][0] = instancia[372];
+    future[tick][1] = instancia[368];
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick > 24){
@@ -151,7 +155,7 @@ public class FileWriterData{
         count se va a actualizando a medida que se accede a este if
         para emular a los primeros ticks y aÃ±adirles dichos atributos.
       */
-      
+
       /* Aquí se calcula el numero de monedas/bichos que se consiguen en los próximos 6, 12 y 24 ticks*/
       futureAttributes[count][mx] = String.valueOf( Integer.parseInt(future[6+count+1][0]) - Integer.parseInt(future[count+1][0]) ); //Monedas
       futureAttributes[count][mx+1] = String.valueOf( Integer.parseInt(future[6+count+1][1]) - Integer.parseInt(future[count+1][1]) ); //Enemigos
@@ -207,7 +211,7 @@ public class FileWriterData{
             instanciaCompleta representa toda la instancia con los futureAttributes
             ya metidos en ella.
           */
-          
+
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
             if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ", ");
             else fich.write(instanciaCompleta[ii] + " \n");
