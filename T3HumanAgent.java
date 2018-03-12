@@ -33,6 +33,7 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
+import java.io.FileWriter;
 import ch.idsia.agents.controllers.FileWriterData;
 
 /**
@@ -61,6 +62,12 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
     {
         this.reset();
         tick = 0;
+        try{
+          FileWriterData.fich = new FileWriter("ejemplos.arff",true);
+        }
+        catch(Exception e){
+          e.printStackTrace(System.out);
+        }
     }
 
     @Override
@@ -92,6 +99,8 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
       coinsInScreen = 0;
       blocksInScreen = 0;
       enemiesInScreen = 0;
+
+          tick++;
 
     	// Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
@@ -159,7 +168,6 @@ public final class T3HumanAgent extends KeyAdapter implements Agent
             }
         }
 
-        tick++;
         //FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 

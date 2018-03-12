@@ -106,6 +106,11 @@ public class FileWriterData{
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile(float[] posMario, int[] dataMatrix, byte[][] envi, boolean[] action, int tick){
 
+    if(dataMatrix[6] == 0){
+      FileWriterData.close_arff();
+      return;
+    }
+
     length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length + action.length;
     String[] instancia = new String[length_instance];
 
@@ -168,13 +173,12 @@ public class FileWriterData{
 
       //Escribir en el fichero toda una instacia
       try {
-          fich = new FileWriter("ejemplos.arff",true);
           file = new File("ejemplos.arff");
           br = new BufferedReader(new FileReader("ejemplos.arff"));
 
           //Establecer Header de fichero arff Ãºnicamente en el primer tick
           //Si no existe el fichero o existe y estÃƒÂ¡ vacÃƒÂ­o...
-          if(br.readLine() == null || !file.exists()) init_arff(envi);
+          if(!file.exists() || br.readLine() == null) init_arff(envi);
 
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
           String[] instanciaActual = myInstance.poll();
@@ -213,11 +217,9 @@ public class FileWriterData{
           */
 
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
-            if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ", ");
+            if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ",");
             else fich.write(instanciaCompleta[ii] + " \n");
           }
-
-          fich.close();
           count++; // Se actualiza el índice de ticks de future y futureAttrib
 
       }
@@ -226,5 +228,16 @@ public class FileWriterData{
       }
     }
     mz = 0;
+  }
+
+  public static void close_arff(){
+    try{
+      if(file.exists()){
+        fich.close();
+      }
+    }
+    catch(Exception e){
+      e.printStackTrace(System.out);
+    }
   }
 }

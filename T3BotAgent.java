@@ -33,6 +33,7 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.agents.controllers.FileWriterData;
 import ch.idsia.tools.EvaluationInfo;
 
+import java.io.FileWriter;
 import java.util.Random;
 
 public class T3BotAgent extends BasicMarioAIAgent implements Agent {
@@ -57,6 +58,12 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
         super("T3BotAgent");
         reset();
         tick = 0;
+        try{
+          FileWriterData.fich = new FileWriter("ejemplos.arff",true);
+        }
+        catch(Exception e){
+          e.printStackTrace(System.out);
+        }
     }
 
     public void reset() {
@@ -65,6 +72,7 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
     }
 
     public void integrateObservation(Environment environment) {
+          tick++;
         // IMPORTANTE: Si se utilizan mÃ©todos que tardan mucho como println, cada tick puede tardar en procesarse mÃ¡s de
         // de lo que permite la competiciÃ³n de Mario AI. Si el agente es demasiado lento procesando y el simulador no
         // puede funcionar en tiempo real, se cerrarÃ¡ automÃ¡ticamente, lor lo que se insta a que el cÃ³digo escrito sea
@@ -200,7 +208,6 @@ public class T3BotAgent extends BasicMarioAIAgent implements Agent {
             }
         }
 
-        tick++;
         //FileWriterData.writeOnFile(posMario, dataMatrix, envi, tick);
     }
 
