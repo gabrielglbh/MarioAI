@@ -97,7 +97,6 @@ public class P2FileWriterData{
       fich.write("@ATTRIBUTE isEnemyNear {true,false} \n");
       fich.write("@ATTRIBUTE isObstacleNear {true,false} \n");
       fich.write("@ATTRIBUTE ticks_since_jump NUMERIC %%%%%% 1 cuando se puede volver a saltar \n");
-      fich.write("@ATTRIBUTE predict_n24 NUMERIC \n");
 
       fich.write("@ATTRIBUTE reward_tick_n6 NUMERIC \n");
       //fich.write("@ATTRIBUTE killsTotal_tick_n6 NUMERIC \n");
@@ -106,7 +105,14 @@ public class P2FileWriterData{
       fich.write("@ATTRIBUTE reward_tick_n24 NUMERIC \n");
       //fich.write("@ATTRIBUTE killsTotal_tick_n24 NUMERIC \n");
 
-      fich.write("@ATTRIBUTE JUMP_Action {Jump,Do_Not_Jump} \n");
+      fich.write("@ATTRIBUTE predict_n24 NUMERIC \n");
+
+      fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_DOWN {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_JUMP {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_SPEED {true, false} \n");
+      fich.write("@ATTRIBUTE KEY_UP {true, false} \n");
 
       fich.write("\n@data \n");
     }
@@ -118,7 +124,7 @@ public class P2FileWriterData{
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, 
-		  						  int[] marioState, int ticks_since_jump, String jump_action, int tick ){
+		  						  int[] marioState, int ticks_since_jump, boolean[] action, int tick ){
 
 	  //if (tick < 2) System.out.println("Tick: " + tick);
     if(dataMatrix[10] == 0){
@@ -169,7 +175,7 @@ public class P2FileWriterData{
                 + 4.5931 * coinsInZone
                 - 0.0576 * enemiesInZone
                 + 4.7034 + 0.4138
-                + 11.0464 * (jump_action == "Jump"? 1:0)
+                + 11.0464 * (action[3] == true? 1:0)
                 + 360.7746;
     ruleTriggered = true;
   }
@@ -383,8 +389,8 @@ public class P2FileWriterData{
     ruleTriggered = true;
   }
   
-  	// +5: isEnemyNear, isObstacleNear, ticks_since_jump, predict_n24, JUMP_action
-    length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length + marioState.length +5;
+  	// +5: isEnemyNear, isObstacleNear, ticks_since_jump, predict_n24
+    length_instance = envi.length*envi[0].length + posMario.length + dataMatrix.length + marioState.length + action.length +4;
     String[] instancia = new String[length_instance];
 
     //Meter todo en matriz instancia
@@ -450,7 +456,10 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(predict_n24);
     mz++;
 
-    instancia[mz] = jump_action;
+    for(int mx = 0; mx < action.length; mx++){
+    	instancia[mz] = String.valueOf(action[mx]);
+    	mz++;
+    }
 
     myInstance.add(instancia);
 
@@ -492,7 +501,7 @@ public class P2FileWriterData{
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
             //Mientras que no estemos en la ultima posicion ir añadiendo atributos
-            if(a != instanciaActual.length-1) instanciaCompleta[a] = instanciaActual[a];
+            if(a != instanciaActual.length-7) instanciaCompleta[a] = instanciaActual[a];
             /*
               Si estamos en la última posicion de la instanciaActual, añadir
               loa futureAttributes a la instanciaCompleta y por último añadir
@@ -503,7 +512,9 @@ public class P2FileWriterData{
                 instanciaCompleta[a+my] = String.valueOf( futureRewIncrement[my] );
               }
               // Añadir el último atributo de instanciaActual al final de instanciaCompleta, para que sea la clase
-              instanciaCompleta[instanciaCompleta.length-1] = instanciaActual[instanciaActual.length-1];
+              for(int ii = 7; ii > 0; ii--){
+            	  instanciaCompleta[instanciaCompleta.length -ii] = instanciaActual[instanciaActual.length-ii];
+              }
               break;
             }
           }
@@ -519,7 +530,6 @@ public class P2FileWriterData{
             el incremento futuro de la recompensa y la acción al final (la clase).
           */
 
-          //fich.write("%%%%%%%%%%%%%%%%%%%%------------TICK: " + tick + "----------%%%%%%%%%%%%%%%%%%%%\n");
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
               if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ",");
               else fich.write(instanciaCompleta[ii] + " \n");

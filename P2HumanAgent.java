@@ -92,7 +92,7 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         count = 1;
       }
 
-      P2FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, multiclass, tick);
+      P2FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, Action, tick);
     	return Action;
     }
 

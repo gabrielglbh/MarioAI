@@ -328,7 +328,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         if(action[Mario.KEY_JUMP]) multiclass = "Jump";
         else multiclass = "Do_Not_Jump";
 
-        P2FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, multiclass, tick);
+        P2FileWriterData.writeOnFile(envi, posMario, dataMatrix, marioState, count, action, tick);
 
         return action;
     }
