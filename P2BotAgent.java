@@ -57,7 +57,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     String multiclass = "";
     int tick;
     int count = 0;
-    
+
     public P2BotAgent() {
         super("P1BotAgentEntrega");
         reset();
@@ -77,11 +77,11 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
 
     public void integrateObservation(Environment environment) {
         tick++;
-        
+
         coinsInScreen = 0;
         enemiesInScreen = 0;
         blocksInScreen = 0;
-          
+
         // INFORMACION DEL ENTORNO
         // Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
@@ -91,15 +91,15 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         for (int mx = 0; mx < env.length; mx++) {
             for (int my = 0; my < env[mx].length; my++) {
             	envi[mx][my] = env[mx][my];
-            	
+
                 //Coins on screen
                 if (envi[mx][my] == 2) coinsInScreen++;
-                
+
                 //If blocks
                 if (envi[mx][my] == -22 || envi[mx][my] == -60 || envi[mx][my] == -80 ||
                     envi[mx][my] == -62 || envi[mx][my] == -24 || envi[mx][my] == -85)
                     blocksInScreen++;
-                
+
                 //If enemies
                 if (envi[mx][my] == 1 || envi[mx][my] == 80 || envi[mx][my] == 95 ||
                     envi[mx][my] == 82 || envi[mx][my] == 97 || envi[mx][my] == 81 ||
@@ -123,20 +123,20 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         } // dataMatrix: 2 posiciones ocupadas
 
         ///////// Estado de mario
-        // marioStatus, marioMode, 
-        // ** isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), 
-        //    isMarioAbleToShoot (1 o 0),isMarioCarrying (1 o 0), 
+        // marioStatus, marioMode,
+        // ** isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0),
+        //    isMarioAbleToShoot (1 o 0),isMarioCarrying (1 o 0),
         // **
         // killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
         //System.out.println("\nESTADO MARIO");
         marioState = new int[4];
         int[] marioState_temp = environment.getMarioState();
-        
+
         marioState[0] = marioState_temp[2];
         marioState[1] = marioState_temp[3];
         marioState[2] = marioState_temp[4];
         marioState[3] = marioState_temp[5];
-        
+
         //////// Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
         // marioStatus, mushroomsDevoured, coinsGained, timeLeft, timeSpent, hiddenBlocksFound /14
@@ -159,7 +159,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     }
 
     public boolean[] getAction() {
-    	
+
     //	if(tick < 2) System.out.println("Tick inicial: " + tick);
         // La accion es un array de booleanos de dimension 6
         // action[Mario.KEY_LEFT] Mueve a Mario a la izquierda
@@ -252,10 +252,10 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
                     envi[this.marioEgoRow-1][this.marioEgoCol + i] == -62 &&
                     envi[this.marioEgoRow-2][this.marioEgoCol + i] == -62 &&
                     envi[this.marioEgoRow-3][this.marioEgoCol + i] == -62    ){
-                	
+
                   action[2] = false;
                   action[3] = true;
-                  
+
                   if(jumpButtonPressed < 0) jumpButtonPressed = tick +9;
                   break;
                 }
@@ -273,7 +273,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
                 else{
                   action[2] = false;
                   action[3] = true;
-                  
+
                   if(jumpButtonPressed < 0) jumpButtonPressed = tick +8;
                   break;
                 }
@@ -281,7 +281,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
                 //Si se ecnuentra un Goomba, saltar lo mínimo
                 action[2] = false;
                 action[3] = true;
-                
+
                 if(jumpButtonPressed < 0) jumpButtonPressed = tick +2;
                 break;
               case -85: //Tuberia ocn flor o caÃ±on
@@ -295,10 +295,10 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
                     envi[this.marioEgoRow-1][this.marioEgoCol + i] == -85 &&
                     envi[this.marioEgoRow-2][this.marioEgoCol + i] == -85 &&
                     envi[this.marioEgoRow-3][this.marioEgoCol + i] == -85    ){
-                  
+
                   action[2] = false;
                   action[3] = true;
-                
+
                   if(jumpButtonPressed < 0) jumpButtonPressed = tick +9;
                   break;
                 }
@@ -306,7 +306,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
                 else{
                   action[2] = false;
                   action[3] = true;
-                  
+
                   if(jumpButtonPressed < 0) jumpButtonPressed = tick +8;
                   break;
                 }
@@ -320,7 +320,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         }
         count++;
 
-        // Si Mario est� en el suelo y puede saltar, el contador se reinicia a 1
+        // Si Mario est� en el suelo y puede saltar, el contador se reinicia a 1
         if(marioState[0] == 1 && marioState[1] == 1){
           count = 1;
         }
