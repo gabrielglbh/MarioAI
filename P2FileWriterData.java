@@ -31,8 +31,11 @@ public class P2FileWriterData{
   static int length_instance = 0; // Vestigial, se puede quitar (no me atrevo, no sea que la lÃ­e)
   static int count = 0;
 
-  static boolean isEnemy = false;
-  static boolean isBlock = false;
+  static int enemiesSectionA = -1;
+  static int obstacleSectionA = -1;
+  static int coinsSectionA = -1;
+  static int enemiesSectionB = -1;
+  static int coinsSectionB = -1;
 
   public P2FileWriterData(){}
 
@@ -58,7 +61,6 @@ public class P2FileWriterData{
         fich.write("@ATTRIBUTE pos_environment_[" + mx + "_" + my + "] NUMERIC \n");
       }
 
-      fich.write("@ATTRIBUTE coinsGained NUMERIC \n");
       fich.write("@ATTRIBUTE reward NUMERIC \n");
 
       fich.write("@ATTRIBUTE isMarioOnGround NUMERIC \n");
@@ -70,7 +72,7 @@ public class P2FileWriterData{
       fich.write("@ATTRIBUTE reward_tick_n12 NUMERIC \n");
       fich.write("@ATTRIBUTE reward_tick_n24 NUMERIC \n");
 
-      fich.write("@ATTRIBUTE ticks_since_jump NUMERIC %%%%%% 1 cuando se puede volver a saltar \n");
+      fich.write("@ATTRIBUTE ticks_in_air NUMERIC %%%%%% 1 cuando se puede volver a saltar \n");
 
       fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
       fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
@@ -89,7 +91,7 @@ public class P2FileWriterData{
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix,
-		  						  int[] marioState, int ticks_since_jump, boolean[] action, int tick ){
+		  						  int[] marioState, int ticks_in_air, boolean[] action, int tick ){
 
 	  //if (tick < 2) System.out.println("Tick: " + tick);
     if(dataMatrix[10] == 0){
@@ -97,21 +99,22 @@ public class P2FileWriterData{
       return;
     }
 
-  	// +1: ticks_since_jump
-    // +25: Grid; +2: dataMatrix; +4: Status
-    length_instance = 49 + 2 + 4 + action.length +1;
+    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
+    length_instance = 49 +1 +4 +1 +5 +action.length ;
     String[] instancia = new String[length_instance];
 
     //5x5 grid
+    /****************************************************************************************/
+    /* Grabiel, pon los atributos del envi nominales
+    de acuerdo con el nivel de detalle 1. Gracias. Puto */
+    /****************************************************************************************/
     for(int mx = 6; mx < 13; mx++) for(int my = 6; my < 13; my++){
         instancia[mz] = String.valueOf(envi[mx][my]);
         mz++;
-    }
+    } //mz = 49
 
-    instancia[mz] = String.valueOf(dataMatrix[12]);
-    mz++;
     instancia[mz] = String.valueOf(dataMatrix[19]);
-    mz++;
+    mz++; //mz = 50
 
     instancia[mz] = String.valueOf(marioState[0]);
     mz++;
@@ -120,15 +123,66 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(marioState[2]);
     mz++;
     instancia[mz] = String.valueOf(marioState[3]);
-    mz++;
+    mz++; //mz = 54
 
-    instancia[mz] = String.valueOf(ticks_since_jump);
-    mz++;
+    instancia[mz] = String.valueOf(ticks_in_air);
+    mz++; //mz = 55
+
+    //SECCION A: NUMERO DE ENEMIGOS
+    enemiesSectionA = 0;
+    for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
+      if(envi[ii][jj] == 80) enemiesSectionA++;
+    }
+    instancia[mz] = String.valueOf(enemiesSectionA);
+    mz++; //mz = 56
+
+    //SECCION A: ALTURA DE OBSTACULO
+    obstacleSectionA = 0;
+    for(int jj = 9; jj < 13; jj++){
+      if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
+        obstacleSectionA++;
+        if(envi[8][jj] == -24 | envi[8][jj] == -60 | envi[8][jj] == -85){
+          obstacleSectionA++;
+          if(envi[7][jj] == -24 | envi[7][jj] == -60 | envi[7][jj] == -85){
+            obstacleSectionA++;
+            if(envi[6][jj] == -24 | envi[6][jj] == -60 | envi[6][jj] == -85){
+              obstacleSectionA++;
+            }
+          }
+        }
+      }
+    }
+    instancia[mz] = String.valueOf(obstacleSectionA);
+    mz++; //mz = 57
+
+    //SECCION A: NUMERO DE COINS
+    coinsSectionA = 0;
+    for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
+      if(envi[ii][jj] == 2) coinsSectionA++;
+    }
+    instancia[mz] = String.valueOf(coinsSectionA);
+    mz++; //mz = 58
+
+    //SECCION B (abajo derecha): NUMERO DE ENEMIGOS
+    enemiesSectionB = 0;
+    for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
+      if(envi[ii][jj] == 80) enemiesSectionB++;
+    }
+    instancia[mz] = String.valueOf(enemiesSectionB);
+    mz++; //mz = 59
+
+    //SECCION B: NUMERO DE COINS
+    coinsSectionB = 0;
+    for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
+      if(envi[ii][jj] == 2) coinsSectionB++;
+    }
+    instancia[mz] = String.valueOf(coinsSectionB);
+    mz++; //mz = 60
 
     for(int mx = 0; mx < action.length; mx++){
     	instancia[mz] = String.valueOf(action[mx]);
     	mz++;
-    }
+    } //mz = 64
 
     myInstance.add(instancia);
 
@@ -171,7 +225,7 @@ public class P2FileWriterData{
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
             //Mientras que no estemos en la ultima posicion ir a�adiendo atributos
-            if(a != instanciaActual.length-7) instanciaCompleta[a] = instanciaActual[a];
+            if(a != instanciaActual.length-6) instanciaCompleta[a] = instanciaActual[a];
             /*
               Si estamos en la �ltima posicion de la instanciaActual, a�adir
               loa futureAttributes a la instanciaCompleta y por �ltimo a�adir
@@ -182,7 +236,7 @@ public class P2FileWriterData{
                 instanciaCompleta[a+my] = String.valueOf(futureRewIncrement[my]);
               }
               // A�adir el �ltimo atributo de instanciaActual al final de instanciaCompleta, para que sea la clase
-              for(int ii = 7; ii > 0; ii--){
+              for(int ii = 6; ii > 0; ii--){
             	  instanciaCompleta[instanciaCompleta.length -ii] = instanciaActual[instanciaActual.length-ii];
               }
               break;
