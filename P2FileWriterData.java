@@ -19,7 +19,9 @@ public class P2FileWriterData{
 
   //3000 ticks como maximo, luego si sobra espacio se reajusta
   static int[] futureReward = new int[3000];
-  static int[] futureRewIncrement = new int[3]; //[3] for n +6, +12 and +24
+  static int[] futureDistance = new int[3000];
+
+  static int[] futureAttrsIncrement = new int[6]; //3 for reward n+6,+12,+24; 3 for distance n+6,+12,+24;
 
   //Queue para luego imprimir los ticks con su debido orden
   static Queue<String[]> myInstance = new LinkedList<String[]>();
@@ -99,8 +101,8 @@ public class P2FileWriterData{
       return;
     }
 
-    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
-    length_instance = 49 +1 +4 +1 +5 +action.length ;
+    // +49: Grid; +2: distPassed, reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
+    length_instance = 49 +2 +4 +1 +5 +action.length ;
     String[] instancia = new String[length_instance];
 
     //5x5 grid
@@ -113,6 +115,10 @@ public class P2FileWriterData{
         mz++;
     } //mz = 49
 
+    //  DistancePassedCells
+    instancia[mz] = String.valueOf(dataMatrix[2]);
+    mz++;
+    // Reward
     instancia[mz] = String.valueOf(dataMatrix[19]);
     mz++; //mz = 50
 
@@ -128,7 +134,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(ticks_in_air);
     mz++; //mz = 55
 
-    //SECCION A: NUMERO DE ENEMIGOS
+    // SECCION A: NUMERO DE ENEMIGOS
     enemiesSectionA = 0;
     for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
       if(envi[ii][jj] == 80) enemiesSectionA++;
@@ -136,7 +142,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(enemiesSectionA);
     mz++; //mz = 56
 
-    //SECCION A: ALTURA DE OBSTACULO
+    // SECCION A: ALTURA DE OBSTACULO
     obstacleSectionA = 0;
     for(int jj = 9; jj < 13; jj++){
       if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
@@ -155,7 +161,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(obstacleSectionA);
     mz++; //mz = 57
 
-    //SECCION A: NUMERO DE COINS
+    // SECCION A: NUMERO DE COINS
     coinsSectionA = 0;
     for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
       if(envi[ii][jj] == 2) coinsSectionA++;
@@ -163,7 +169,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(coinsSectionA);
     mz++; //mz = 58
 
-    //SECCION B (abajo derecha): NUMERO DE ENEMIGOS
+    // SECCION B (abajo derecha): NUMERO DE ENEMIGOS
     enemiesSectionB = 0;
     for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
       if(envi[ii][jj] == 80) enemiesSectionB++;
@@ -171,7 +177,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(enemiesSectionB);
     mz++; //mz = 59
 
-    //SECCION B: NUMERO DE COINS
+    // SECCION B: NUMERO DE COINS
     coinsSectionB = 0;
     for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
       if(envi[ii][jj] == 2) coinsSectionB++;
@@ -179,6 +185,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(coinsSectionB);
     mz++; //mz = 60
 
+    // Action
     for(int mx = 0; mx < action.length; mx++){
     	instancia[mz] = String.valueOf(action[mx]);
     	mz++;
@@ -187,11 +194,11 @@ public class P2FileWriterData{
     myInstance.add(instancia);
 
     /*
-      Se aï¿½ade la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
+      Se añade la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
       Asi, en el tick = 6 (future[6]) sabemos cuanto ha aumentado la recompensa en ese espacio de tiempo.
     */
     futureReward[tick -1] = dataMatrix[19]; // Reward: dataMatrix[19]; also: envi[][].len + posMario.len + 19
-    //future[tick][1] = instancia[371]; // MonstersInScreen: envi[][].len + posMario.len + 8
+    futureDistance[tick -1] = dataMatrix[2]; // DistancePassedCells
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick > 24){
@@ -203,10 +210,13 @@ public class P2FileWriterData{
         para emular a los primeros ticks y anadirles dichos atributos.
       */
 
-      /* Aqui se calcula cuanto aumenta la recompensa (reward) en los prï¿½ximos 6, 12 y 24 ticks*/
-      futureRewIncrement[0] = futureReward[6+count] - futureReward[count]; // Reward
-      futureRewIncrement[1] = futureReward[12+count] - futureReward[count]; // Reward
-      futureRewIncrement[2] = futureReward[24+count] - futureReward[count]; // Reward
+      /* Aqui se calcula cuanto aumenta la recompensa (reward) en los proximos 6, 12 y 24 ticks*/
+      futureAttrsIncrement[0] = futureReward[6+count] - futureReward[count]; // Reward
+      futureAttrsIncrement[1] = futureReward[12+count] - futureReward[count]; // Reward
+      futureAttrsIncrement[2] = futureReward[24+count] - futureReward[count]; // Reward
+      futureAttrsIncrement[3] = futureDistance[6+count] - futureDistance[count]; // Distance
+      futureAttrsIncrement[4] = futureDistance[12+count] - futureDistance[count]; // Distance
+      futureAttrsIncrement[5] = futureDistance[24+count] - futureDistance[count]; // Reward
 
       //Escribir en el fichero toda una instacia
       try {
@@ -220,22 +230,23 @@ public class P2FileWriterData{
 
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
           String[] instanciaActual = myInstance.poll();
-          String[] instanciaCompleta = new String[instanciaActual.length + futureRewIncrement.length];
+          String[] instanciaCompleta = new String[instanciaActual.length + futureAttrsIncrement.length];
 
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
             //Mientras que no estemos en la ultima posicion ir aï¿½adiendo atributos
             if(a != instanciaActual.length-6) instanciaCompleta[a] = instanciaActual[a];
             /*
-              Si estamos en la ï¿½ltima posicion de la instanciaActual, aï¿½adir
+              Si estamos en la ultima posicion de la instanciaActual, aï¿½adir
               loa futureAttributes a la instanciaCompleta y por ï¿½ltimo aï¿½adir
               la clase JUMP_action.
             */
             else{
-              for(int my = 0; my < futureRewIncrement.length; my++){
-                instanciaCompleta[a+my] = String.valueOf(futureRewIncrement[my]);
+              for(int my = 0; my < futureAttrsIncrement.length; my++){
+                instanciaCompleta[a+my] = String.valueOf(futureAttrsIncrement[my]);
               }
-              // Aï¿½adir el ï¿½ltimo atributo de instanciaActual al final de instanciaCompleta, para que sea la clase
+              
+              // Poner la action al final de la instancia (TODO: poner el valor de evaluación)
               for(int ii = 6; ii > 0; ii--){
             	  instanciaCompleta[instanciaCompleta.length -ii] = instanciaActual[instanciaActual.length-ii];
               }
