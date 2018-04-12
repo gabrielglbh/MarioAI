@@ -60,12 +60,15 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
     String multiclass = "";
     int tick;
     int count = 0;
+    
+    Instancia[][] baseConoc;
 
     public P2HumanAgent()
     {
         this.reset();
         tick = 0;
         try{
+        	//baseConoc = P2FileWriterData.leerBaseConoc("/baseConocimiento.csv");
           P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
         }
         catch(Exception e){

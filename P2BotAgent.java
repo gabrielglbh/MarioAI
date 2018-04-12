@@ -31,8 +31,11 @@ import ch.idsia.agents.Agent;
 import ch.idsia.benchmark.mario.engine.sprites.Mario;
 import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.agents.controllers.P2FileWriterData;
+import ch.idsia.agents.controllers.Instancia;
 import ch.idsia.tools.EvaluationInfo;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Random;
 
@@ -57,12 +60,15 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     String multiclass = "";
     int tick;
     int count = 0;
+    
+    Instancia[][] baseConoc;
 
     public P2BotAgent() {
         super("P1BotAgentEntrega");
         reset();
         tick = 0;
         try{
+          //baseConoc = P2FileWriterData.leerBaseConoc("/baseConocimiento.csv");
           P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
         }
         catch(Exception e){

@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.RandomAccessFile;
-
 import java.nio.file.Files;
 import java.util.*;
 
@@ -89,6 +88,30 @@ public class P2FileWriterData{
         e.printStackTrace(System.out);
     }
   }*/
+  public static Instancia[][] leerBaseConoc(String ruta){
+	  Instancia[][] baseConoc = new Instancia[4][200];
+	  String csvFile = ruta;
+      BufferedReader br = null;
+      String lineaCsv = "";
+      int situ = 0, counter = 0;
+      
+	  try{         
+          br = new BufferedReader(new FileReader(csvFile));       
+          while ((lineaCsv = br.readLine()) != null) {
+        	  if(lineaCsv.compareTo("%") != 0){
+        		  baseConoc[situ][counter] = new Instancia(lineaCsv);
+        		  counter++;
+        	  } else{
+        		  situ++;
+        	  } 	  
+          }
+          br.close();
+	  }
+	  catch(Exception e){
+          e.printStackTrace(System.out);
+      }
+	  return baseConoc;
+  }
 
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
@@ -101,8 +124,8 @@ public class P2FileWriterData{
       return;
     }
 
-    // +49: Grid; +2: distPassed, reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
-    length_instance = 49 +2 +4 +1 +5 +action.length ;
+    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
+    length_instance = 49 +1 +4 +1 +5 +action.length ;
     String[] instancia = new String[length_instance];
 
     //7x7 grid
@@ -140,9 +163,6 @@ public class P2FileWriterData{
         mz++;
     } //mz = 49
 
-    //  DistancePassedCells
-    instancia[mz] = String.valueOf(dataMatrix[2]);
-    mz++;
     // Reward
     instancia[mz] = String.valueOf(dataMatrix[19]);
     mz++; //mz = 50
