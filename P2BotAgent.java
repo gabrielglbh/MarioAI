@@ -63,7 +63,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         reset();
         tick = 0;
         try{
-          P2FileWriterData.fich = new FileWriter("ejemplos.arff",true);
+          P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
