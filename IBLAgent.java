@@ -178,19 +178,22 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
 
         // SECCION A: ALTURA DE OBSTACULO
         obstacleSectionA = 0;
+        int count_altura;
         for(int jj = 9; jj < 13; jj++){
-          if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
-            obstacleSectionA++;
+          count_altura = 0;
+          if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85){
+            count_altura++;
             if(envi[8][jj] == -24 | envi[8][jj] == -60 | envi[8][jj] == -85){
-              obstacleSectionA++;
+              count_altura++;
               if(envi[7][jj] == -24 | envi[7][jj] == -60 | envi[7][jj] == -85){
-                obstacleSectionA++;
+                count_altura++;
                 if(envi[6][jj] == -24 | envi[6][jj] == -60 | envi[6][jj] == -85){
-                  obstacleSectionA++;
+                  count_altura++;
                 }
               }
             }
           }
+          if (count_altura > obstacleSectionA) obstacleSectionA = count_altura;
         }
         sectionAttrs[mz] = obstacleSectionA;
         mz++; //mz = 2
@@ -236,9 +239,10 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         // os dareis cuenta que si manteneis pulsado todo el tiempo el boton de saltar, Mario no salta todo el tiempo sino una
         // unica vez en el momento en que se pulsa. Para volver a saltar debeis despulsarlo (action[Mario.KEY_JUMP] = false),
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
+    	
     	int pertenencia;
     	// maState[0] == 0 -> en el aire / == 1 -> en el suelo
-    	//pertenencia = 50*marioState[0] +;
+    	pertenencia = 50*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 3*sectionAttrs[2];
 
         count++;
         // Si Mario esta en el suelo y puede saltar, el contador se reinicia a 1
