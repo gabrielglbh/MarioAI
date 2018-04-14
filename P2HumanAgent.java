@@ -57,9 +57,9 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
     int blocksInScreen = 0;
     int enemiesInScreen = 0;
 
-    String multiclass = "";
     int tick;
     int count = 0;
+    int[] sectionAttrs = new int[5];
     
     Instancia[][] baseConoc;
 
@@ -84,10 +84,6 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
 
     @Override
     public boolean[] getAction() {
-    	//System.out.println("\nHola actuo cada tick :D");
-
-      if(Action[Mario.KEY_JUMP]) multiclass = "Jump";
-      else multiclass = "Do_Not_Jump";
 
       count++;
 
@@ -95,7 +91,7 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         count = 1;
       }
 
-      P2FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, Action, tick);
+      P2FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, sectionAttrs, Action, tick);
     	return Action;
     }
 
@@ -177,6 +173,61 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         dataMatrix[17] = blocksInScreen;
         dataMatrix[18] = enemiesInScreen;
         dataMatrix[19] = reward;
+        
+        // Atributos de las secciones del entorno cercano de Mario
+        int enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+        int mz = 0;
+        
+        // SECCION A: NUMERO DE ENEMIGOS
+        enemiesSectionA = 0;
+        for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
+          if(envi[ii][jj] == 80) enemiesSectionA++;
+        }
+        sectionAttrs[mz] = enemiesSectionA;
+        mz++; //mz = 1
+
+        // SECCION A: ALTURA DE OBSTACULO
+        obstacleSectionA = 0;
+        for(int jj = 9; jj < 13; jj++){
+          if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
+            obstacleSectionA++;
+            if(envi[8][jj] == -24 | envi[8][jj] == -60 | envi[8][jj] == -85){
+              obstacleSectionA++;
+              if(envi[7][jj] == -24 | envi[7][jj] == -60 | envi[7][jj] == -85){
+                obstacleSectionA++;
+                if(envi[6][jj] == -24 | envi[6][jj] == -60 | envi[6][jj] == -85){
+                  obstacleSectionA++;
+                }
+              }
+            }
+          }
+        }
+        sectionAttrs[mz] = obstacleSectionA;
+        mz++; //mz = 2
+
+        // SECCION A: NUMERO DE COINS
+        coinsSectionA = 0;
+        for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
+          if(envi[ii][jj] == 2) coinsSectionA++;
+        }
+        sectionAttrs[mz] = coinsSectionA;
+        mz++; //mz = 3
+
+        // SECCION B (abajo derecha): NUMERO DE ENEMIGOS
+        enemiesSectionB = 0;
+        for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
+          if(envi[ii][jj] == 80) enemiesSectionB++;
+        }
+        sectionAttrs[mz] = enemiesSectionB;
+        mz++; //mz = 4
+
+        // SECCION B: NUMERO DE COINS
+        coinsSectionB = 0;
+        for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
+          if(envi[ii][jj] == 2) coinsSectionB++;
+        }
+        sectionAttrs[mz] = coinsSectionB;
+        mz++; //mz = 5
     }
 
     @Override

@@ -10,6 +10,8 @@ import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.util.*;
 
+import ch.idsia.agents.controllers.Instancia;
+
 public class P2FileWriterData{
   //Variables globales para el fichero de ejemplos.txt
   static FileWriter fich = null;
@@ -17,10 +19,11 @@ public class P2FileWriterData{
   static File file = null;
 
   //3000 ticks como maximo, luego si sobra espacio se reajusta
-  static int[] futureReward = new int[3000];
+  static int[] futureCoins = new int[3000];
+  static int[] futureMode = new int[3000];
   static int[] futureDistance = new int[3000];
 
-  static int[] futureAttrsIncrement = new int[6]; //3 for reward n+6,+12,+24; 3 for distance n+6,+12,+24;
+  static int[] futureAttrsIncrement = new int[3]; //3 for reward n+6,+12,+24; 3 for distance n+6,+12,+24;
 
   //Queue para luego imprimir los ticks con su debido orden
   static Queue<String[]> myInstance = new LinkedList<String[]>();
@@ -37,6 +40,10 @@ public class P2FileWriterData{
   static int coinsSectionA = -1;
   static int enemiesSectionB = -1;
   static int coinsSectionB = -1;
+  
+  /* CONSTANTES GLOBALES */
+  static final int NUM_SITUACIONES = 2;
+  static final int NUM_INST_POR_SITU = 200;
 
   public P2FileWriterData(){}
 
@@ -89,20 +96,24 @@ public class P2FileWriterData{
     }
   }*/
   public static Instancia[][] leerBaseConoc(String ruta){
-	  Instancia[][] baseConoc = new Instancia[4][200];
+	  Instancia[][] baseConoc = new Instancia[NUM_SITUACIONES][NUM_INST_POR_SITU];
 	  String csvFile = ruta;
       BufferedReader br = null;
       String lineaCsv = "";
       int situ = 0, counter = 0;
       
 	  try{         
-          br = new BufferedReader(new FileReader(csvFile));       
+          br = new BufferedReader(new FileReader(csvFile));  
+          // Recorre el fichero hasta el final
           while ((lineaCsv = br.readLine()) != null) {
-        	  if(lineaCsv.compareTo("%") != 0){
+        	  // Lee una linea hasta que llegue al separador o llene las instancias
+        	  if(lineaCsv.compareTo("%") != 0 
+        			  && counter < NUM_INST_POR_SITU && situ < NUM_SITUACIONES){
         		  baseConoc[situ][counter] = new Instancia(lineaCsv);
         		  counter++;
         	  } else{
         		  situ++;
+        		  counter = 0;
         	  } 	  
           }
           br.close();
@@ -110,13 +121,13 @@ public class P2FileWriterData{
 	  catch(Exception e){
           e.printStackTrace(System.out);
       }
-	  return baseConoc;
+	  return baseConoc; // Esto funca :D
   }
 
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
-  public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix,
-		  						  int[] marioState, int ticks_in_air, boolean[] action, int tick ){
+  public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, int[] marioState, 
+		  							int ticks_in_air, int[] sectionAttrs, boolean[] action, int tick ){
 
 	  //if (tick < 2) System.out.println("Tick: " + tick);
     if(dataMatrix[10] == 0){
@@ -125,7 +136,7 @@ public class P2FileWriterData{
     }
 
     // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
-    length_instance = 49 +1 +4 +1 +5 +action.length ;
+    length_instance = 49 +1 +marioState.length +1 +sectionAttrs.length +action.length ;
     String[] instancia = new String[length_instance];
 
     //7x7 grid
@@ -179,6 +190,7 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(ticks_in_air);
     mz++; //mz = 55
 
+    /*
     // SECCION A: NUMERO DE ENEMIGOS
     enemiesSectionA = 0;
     for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
@@ -229,6 +241,11 @@ public class P2FileWriterData{
     }
     instancia[mz] = String.valueOf(coinsSectionB);
     mz++; //mz = 60
+    */
+    for(int mx = 0; mx < sectionAttrs.length; mx++){
+    	instancia[mz] = String.valueOf(sectionAttrs[mx]);
+    	mz++;
+    }
 
     // Action
     for(int mx = 0; mx < action.length; mx++){
@@ -242,24 +259,22 @@ public class P2FileWriterData{
       Se añade la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
       Asi, en el tick = 6 (future[6]) sabemos cuanto ha aumentado la recompensa en ese espacio de tiempo.
     */
-    futureReward[tick -1] = dataMatrix[19]; // Reward: dataMatrix[19]; also: envi[][].len + posMario.len + 19
-    futureDistance[tick -1] = dataMatrix[2]; // DistancePassedCells
+    futureCoins[tick - 1] = dataMatrix[12]; // coins
+    futureMode[tick - 1] = dataMatrix[9]; // status (if it was hit by an enemy)
+    futureDistance[tick - 1] = dataMatrix[2]; // DistancePassedCells
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
     if(tick > 24){
-      /* Aqui se calcula cuanto aumenta la recompensa (reward) en los proximos 6, 12 y 24 ticks*/
-      futureAttrsIncrement[0] = futureReward[6+count] - futureReward[count]; // Reward n+6
-      futureAttrsIncrement[1] = futureReward[12+count] - futureReward[count]; // Reward n+12
-      futureAttrsIncrement[2] = futureReward[24+count] - futureReward[count]; // Reward n+24
-      futureAttrsIncrement[3] = futureDistance[6+count] - futureDistance[count]; // Distance n+6
-      futureAttrsIncrement[4] = futureDistance[12+count] - futureDistance[count]; // Distance n+12
-      futureAttrsIncrement[5] = futureDistance[24+count] - futureDistance[count]; // Distance n+24
-      
-      
+      /* Aqui se calcula el valor dentro de 12 ticks de monedas recogidas, status de Mario y distancia recorrida*/
+      futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
+      futureAttrsIncrement[1] = futureMode[count +12] - futureMode[count]; // Mode n+12
+      futureAttrsIncrement[2] = futureDistance[count +12] - futureDistance[count]; // Distance n+12
+       
       //////////// Valor de evaluación de la instancia ////////////
       float instEvaluation;
-      if(futureAttrsIncrement[1] >= 0) instEvaluation = (float) (futureAttrsIncrement[1])/16 + 4*futureAttrsIncrement[4];
-      else instEvaluation = (float) (futureAttrsIncrement[1]) + 7*futureAttrsIncrement[4];
+      instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
+    		 + 10*futureAttrsIncrement[2] ;
+      
 
       //Escribir en el fichero toda una instacia
       try {

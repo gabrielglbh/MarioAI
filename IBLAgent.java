@@ -39,7 +39,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Random;
 
-public class P2BotAgent extends BasicMarioAIAgent implements Agent {
+public class IBLAgent extends BasicMarioAIAgent implements Agent {
 
     private Random R = null;
     /**
@@ -63,17 +63,18 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     
     Instancia[][] baseConoc;
 
-    public P2BotAgent() {
+    public IBLAgent() {
         super("P1BotAgentEntrega");
         reset();
         tick = 0;
         try{
-          //baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
+          baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
           P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
         }
+        System.out.println("U mom gay" + baseConoc[1][150].reward);
     }
 
     public void reset() {
@@ -138,10 +139,10 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         marioState = new int[4];
         int[] marioState_temp = environment.getMarioState();
 
-        marioState[0] = marioState_temp[2];
-        marioState[1] = marioState_temp[3];
-        marioState[2] = marioState_temp[4];
-        marioState[3] = marioState_temp[5];
+        marioState[0] = marioState_temp[2]; // isMarioOnGround (1 o 0)
+        marioState[1] = marioState_temp[3]; // isMarioAbleToJump() (1 o 0)
+        marioState[2] = marioState_temp[4]; // isMarioAbleToShoot (1 o 0)
+        marioState[3] = marioState_temp[5]; // isMarioCarrying (1 o 0)
 
         //////// Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
@@ -220,8 +221,6 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     }
 
     public boolean[] getAction() {
-
-    //	if(tick < 2) System.out.println("Tick inicial: " + tick);
         // La accion es un array de booleanos de dimension 6
         // action[Mario.KEY_LEFT] Mueve a Mario a la izquierda
         // action[Mario.KEY_RIGHT] Mueve a Mario a la derecha
@@ -237,151 +236,12 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         // os dareis cuenta que si manteneis pulsado todo el tiempo el boton de saltar, Mario no salta todo el tiempo sino una
         // unica vez en el momento en que se pulsa. Para volver a saltar debeis despulsarlo (action[Mario.KEY_JUMP] = false),
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
+    	int pertenencia;
+    	// maState[0] == 0 -> en el aire / == 1 -> en el suelo
+    	//pertenencia = 50*marioState[0] +;
 
-        //        for (int i = 0; i < Environment.numberOfKeys; ++i) {
-//                  boolean toggleParticularAction = R.nextBoolean();
-//                  toggleParticularAction = (i == 0 && toggleParticularAction && R.nextBoolean()) ? R.nextBoolean() : toggleParticularAction;
-//                  toggleParticularAction = (i == 1 || i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-//                  toggleParticularAction = (i > 3 && !toggleParticularAction) ? R.nextBoolean() : toggleParticularAction;
-//                  action[i] = toggleParticularAction;
-//                }
-
-        action[0] = false; // Nunca ir a la izquierda, de momento...
-        action[1] = true; // Siempre adelante, valiente Mario
-
-        for (int i = 3; i > 0; i--){
-        	switch (envi[this.marioEgoRow][this.marioEgoCol + i]){
-              case -80: //CaÃ±on
-              case 95: //Goomba con alas
-              case 82: //Koopa rojo
-              case 97: //Koopa rojo con alas
-              case 81: //Koopa verde
-              case 96: //Koopa verde con alas
-              case 84: //Bala
-              case 93: //Enemigo puntiagudo
-              case 99: //Enemigo puntiagudo con alas
-              case 91: //Flor enemiga
-              case 13: //CaparazÃ³n
-              case -42: //Tipo de enemigo indefinido
-              case 1:
-                //Si te encuentras con cualquier cosa de las anteriores, salta normal
-            		action[2] = false;
-            		action[3] = true;
-            		if(jumpButtonPressed < 0) jumpButtonPressed = tick+3;
-            		break;
-              case -22: //Ladrillo irrompible con interrogacion
-              case -24: //Ladrillo
-              case -60: //Obstaculo del que no se puede pasar
-              case -62: //ObstÃ¡culo sobre el que se puede saltar y mantenerse encima
-                //Si se encuentra con un ladrillo y el ladrillo es muy alto, salta más
-                if( envi[this.marioEgoRow][this.marioEgoCol + i]   == -22 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -22 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -22 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -22 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -22 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -22 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -22 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -22 &&
-                    envi[this.marioEgoRow-3][this.marioEgoCol + i] == -22 ||
-
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -24 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -24 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -24 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -24 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -24 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -24 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -24 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -24 &&
-                    envi[this.marioEgoRow-3][this.marioEgoCol + i] == -24 ||
-
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -60 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -60 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -60 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -60 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -60 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -60 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -60 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -60 &&
-                    envi[this.marioEgoRow-3][this.marioEgoCol + i] == -60 ||
-
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -62 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -62 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -62 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -62 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -62 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -62 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -62 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -62 &&
-                    envi[this.marioEgoRow-3][this.marioEgoCol + i] == -62    ){
-
-                  action[2] = false;
-                  action[3] = true;
-
-                  if(jumpButtonPressed < 0) jumpButtonPressed = tick +9;
-                  break;
-                }
-                //Si Mario está atascado por donde solo tiny Mario puede pasar
-                // else if(envi[this.marioEgoRow-1][this.marioEgoCol + 1] == -22 ||
-                //       envi[this.marioEgoRow-1][this.marioEgoCol + 1] == -24 ||
-                //       envi[this.marioEgoRow-1][this.marioEgoCol + 1] == -60 ||
-                //       envi[this.marioEgoRow-1][this.marioEgoCol + 1] == -62){
-                //     action[2] = false;
-                //     action[3] = true;
-                //     if(jumpButtonPressed < 0) jumpButtonPressed = tick+2;
-                //     break;
-                // }
-                //si el ladrillo es bajito, salta lo mínimo
-                else{
-                  action[2] = false;
-                  action[3] = true;
-
-                  if(jumpButtonPressed < 0) jumpButtonPressed = tick +8;
-                  break;
-                }
-              case 80: //Goomba
-                //Si se ecnuentra un Goomba, saltar lo mínimo
-                action[2] = false;
-                action[3] = true;
-
-                if(jumpButtonPressed < 0) jumpButtonPressed = tick +2;
-                break;
-              case -85: //Tuberia ocn flor o caÃ±on
-                //Si se encuentra con un cañón y el cañón es muy alto, salta más
-                if( envi[this.marioEgoRow][this.marioEgoCol + i]   == -85 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -85 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -85 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -85 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -85 ||
-                    envi[this.marioEgoRow][this.marioEgoCol + i]   == -85 &&
-                    envi[this.marioEgoRow-1][this.marioEgoCol + i] == -85 &&
-                    envi[this.marioEgoRow-2][this.marioEgoCol + i] == -85 &&
-                    envi[this.marioEgoRow-3][this.marioEgoCol + i] == -85    ){
-
-                  action[2] = false;
-                  action[3] = true;
-
-                  if(jumpButtonPressed < 0) jumpButtonPressed = tick +9;
-                  break;
-                }
-                //si el cañón es bajito, salta lo mínimo
-                else{
-                  action[2] = false;
-                  action[3] = true;
-
-                  if(jumpButtonPressed < 0) jumpButtonPressed = tick +8;
-                  break;
-                }
-            	default:
-          }
-        }
-
-        if(tick == jumpButtonPressed) {
-      	  action[3] = false;
-      	  jumpButtonPressed = -1;
-        }
         count++;
-
-        // Si Mario est� en el suelo y puede saltar, el contador se reinicia a 1
+        // Si Mario esta en el suelo y puede saltar, el contador se reinicia a 1
         if(marioState[0] == 1 && marioState[1] == 1){
           count = 1;
         }

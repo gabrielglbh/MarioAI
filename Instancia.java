@@ -62,20 +62,16 @@ public class Instancia {
 	int coinsSectionA;
 	int enemiesSectionB;
 	int coinsSectionB;
-	int incrReward_n6;
-	int incrReward_n12;
-	int incrReward_n24;
-	int incrDistance_n6;
+	int incrCoins_n12;
+	int incrMode_n12;
 	int incrDistance_n12;
-	int incrDistance_n24;
 	boolean action_left;
 	boolean action_right;
 	boolean action_down;
 	boolean action_jump;
 	boolean action_speed;
 	boolean action_up;
-	int instEvaluation;
-	// Para que lo pueda procesar tu puto i5 de mierda lul jk
+	float instEvaluation;
 	
 	public Instancia(String instanciaCompleta) {
 		String[] atributos = instanciaCompleta.split(",");
@@ -130,29 +126,26 @@ public class Instancia {
 		pos_12_11 = atributos[47];
 		pos_12_12 = atributos[48];
 		reward = Integer.parseInt(atributos[49]);
-		isMarioOnGround = atributos[50].compareTo("1") == 1 ? true : false;
-		isMarioAbleToJump = atributos[51].compareTo("1") == 1 ? true : false;
-		isMarioAbleToShoot = atributos[52].compareTo("1") == 1 ? true : false;
-		isMarioCarrying = atributos[53].compareTo("1") == 1 ? true : false;
+		isMarioOnGround = atributos[50].compareTo("1") == 0 ? true : false;
+		isMarioAbleToJump = atributos[51].compareTo("1") == 0 ? true : false;
+		isMarioAbleToShoot = atributos[52].compareTo("1") == 0 ? true : false;
+		isMarioCarrying = atributos[53].compareTo("1") == 0 ? true : false;
 		ticks_in_air = Integer.parseInt(atributos[54]);
 		enemiesSectionA = Integer.parseInt(atributos[55]);
 		obstacleSectionA = Integer.parseInt(atributos[56]);
 		coinsSectionA = Integer.parseInt(atributos[57]);
 		enemiesSectionB = Integer.parseInt(atributos[58]);
 		coinsSectionB = Integer.parseInt(atributos[59]);
-		incrReward_n6 = Integer.parseInt(atributos[60]);
-		incrReward_n12 = Integer.parseInt(atributos[61]);
-		incrReward_n24 = Integer.parseInt(atributos[62]);
-		incrDistance_n6 = Integer.parseInt(atributos[63]);
-		incrDistance_n12 = Integer.parseInt(atributos[64]);
-		incrDistance_n24 = Integer.parseInt(atributos[65]);
-		action_left = atributos[66].compareTo("1") == 1 ? true : false;
-		action_right = atributos[67].compareTo("1") == 1 ? true : false;
-		action_down = atributos[68].compareTo("1") == 1 ? true : false;
-		action_jump = atributos[69].compareTo("1") == 1 ? true : false;
-		action_speed = atributos[70].compareTo("1") == 1 ? true : false;
-		action_up = atributos[71].compareTo("1") == 1 ? true : false;
-		instEvaluation = Integer.parseInt(atributos[72]);
+		incrCoins_n12 = Integer.parseInt(atributos[60]);
+		incrMode_n12 = Integer.parseInt(atributos[61]);
+		incrDistance_n12 = Integer.parseInt(atributos[62]);
+		action_left = Boolean.parseBoolean(atributos[63]); //atributos[63].compareTo("1") == 1 ? true : false;
+		action_right = Boolean.parseBoolean(atributos[64]); //atributos[64].compareTo("1") == 1 ? true : false;
+		action_down = Boolean.parseBoolean(atributos[65]);
+		action_jump = Boolean.parseBoolean(atributos[66]);
+		action_speed = Boolean.parseBoolean(atributos[67]);
+		action_up = Boolean.parseBoolean(atributos[68]);
+		instEvaluation = Float.parseFloat(atributos[69]);
 	}
 
 }
