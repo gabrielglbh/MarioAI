@@ -42,7 +42,12 @@ public class P2FileWriterData{
   static int coinsSectionB = -1;
   
   /* CONSTANTES GLOBALES */
-  static final int NUM_SITUACIONES = 2;
+  static final int NUM_SITUACIONES = 4;
+  /* 0: peligro delante estando en el aire
+   * 1: monedas delante estando en el aire
+   * 2: peligro delante estando en el suelo
+   * 3: monedas delante estando en el suelo
+   */
   static final int NUM_INST_POR_SITU = 200;
 
   public P2FileWriterData(){}
@@ -190,58 +195,6 @@ public class P2FileWriterData{
     instancia[mz] = String.valueOf(ticks_in_air);
     mz++; //mz = 55
 
-    /*
-    // SECCION A: NUMERO DE ENEMIGOS
-    enemiesSectionA = 0;
-    for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
-      if(envi[ii][jj] == 80) enemiesSectionA++;
-    }
-    instancia[mz] = String.valueOf(enemiesSectionA);
-    mz++; //mz = 56
-
-    // SECCION A: ALTURA DE OBSTACULO
-    obstacleSectionA = 0;
-    for(int jj = 9; jj < 13; jj++){
-      if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
-        obstacleSectionA++;
-        if(envi[8][jj] == -24 | envi[8][jj] == -60 | envi[8][jj] == -85){
-          obstacleSectionA++;
-          if(envi[7][jj] == -24 | envi[7][jj] == -60 | envi[7][jj] == -85){
-            obstacleSectionA++;
-            if(envi[6][jj] == -24 | envi[6][jj] == -60 | envi[6][jj] == -85){
-              obstacleSectionA++;
-            }
-          }
-        }
-      }
-    }
-    instancia[mz] = String.valueOf(obstacleSectionA);
-    mz++; //mz = 57
-
-    // SECCION A: NUMERO DE COINS
-    coinsSectionA = 0;
-    for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
-      if(envi[ii][jj] == 2) coinsSectionA++;
-    }
-    instancia[mz] = String.valueOf(coinsSectionA);
-    mz++; //mz = 58
-
-    // SECCION B (abajo derecha): NUMERO DE ENEMIGOS
-    enemiesSectionB = 0;
-    for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
-      if(envi[ii][jj] == 80) enemiesSectionB++;
-    }
-    instancia[mz] = String.valueOf(enemiesSectionB);
-    mz++; //mz = 59
-
-    // SECCION B: NUMERO DE COINS
-    coinsSectionB = 0;
-    for(int ii = 10; ii < 13; ii++) for(int jj = 9; jj < 13; jj++){
-      if(envi[ii][jj] == 2) coinsSectionB++;
-    }
-    instancia[mz] = String.valueOf(coinsSectionB);
-    mz++; //mz = 60
-    */
     for(int mx = 0; mx < sectionAttrs.length; mx++){
     	instancia[mz] = String.valueOf(sectionAttrs[mx]);
     	mz++;
@@ -264,7 +217,7 @@ public class P2FileWriterData{
     futureDistance[tick - 1] = dataMatrix[2]; // DistancePassedCells
 
     //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
-    if(tick > 24){
+    if(tick > 12){
       /* Aqui se calcula el valor dentro de 12 ticks de monedas recogidas, status de Mario y distancia recorrida*/
       futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
       futureAttrsIncrement[1] = futureMode[count +12] - futureMode[count]; // Mode n+12

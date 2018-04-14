@@ -188,19 +188,22 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
 
         // SECCION A: ALTURA DE OBSTACULO
         obstacleSectionA = 0;
+        int count_altura;
         for(int jj = 9; jj < 13; jj++){
-          if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85) {
-            obstacleSectionA++;
+          count_altura = 0;
+          if(envi[9][jj] == -24 | envi[9][jj] == -60 | envi[9][jj] == -85){
+            count_altura++;
             if(envi[8][jj] == -24 | envi[8][jj] == -60 | envi[8][jj] == -85){
-              obstacleSectionA++;
+              count_altura++;
               if(envi[7][jj] == -24 | envi[7][jj] == -60 | envi[7][jj] == -85){
-                obstacleSectionA++;
+                count_altura++;
                 if(envi[6][jj] == -24 | envi[6][jj] == -60 | envi[6][jj] == -85){
-                  obstacleSectionA++;
+                  count_altura++;
                 }
               }
             }
           }
+          if (count_altura > obstacleSectionA) obstacleSectionA = count_altura;
         }
         sectionAttrs[mz] = obstacleSectionA;
         mz++; //mz = 2

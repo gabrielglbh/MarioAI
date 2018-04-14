@@ -74,7 +74,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         catch(Exception e){
           e.printStackTrace(System.out);
         }
-        System.out.println("U mom gay" + baseConoc[1][150].reward);
+        System.out.println("U mom gay " + baseConoc[3][150].reward);
     }
 
     public void reset() {
@@ -240,10 +240,29 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         // unica vez en el momento en que se pulsa. Para volver a saltar debeis despulsarlo (action[Mario.KEY_JUMP] = false),
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
     	
-    	int pertenencia;
-    	// maState[0] == 0 -> en el aire / == 1 -> en el suelo
-    	pertenencia = 50*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 3*sectionAttrs[2];
+    	////////////// FUNCION DE PERTENENCIA //////////////
+    	float pertenencia;
+    	/* sectionAttrs:
+    	 * enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+    	 */
+    	pertenencia = (float) 50*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 3*sectionAttrs[2]
+    					- 2*sectionAttrs[3] + sectionAttrs[4];
+    	int situ = -1;
+    	if(pertenencia < 50){    // Mario en el aire
+    		if(pertenencia < 25) situ = 0;
+    		else situ = 1;
+    	} else {                 // Mario en el suelo
+    		if(pertenencia < 75) situ = 2;
+    		else situ = 3;
+    	}
 
+    	////////////// FUNCION DE SIMILITUD //////////////
+    	Instancia[] instSimilares = new Instancia[10];
+//    	for(int ii = 0; ii < baseConoc[situ].length; ii++){
+//    		baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0];
+//    	}
+    	
+    	
         count++;
         // Si Mario esta en el suelo y puede saltar, el contador se reinicia a 1
         if(marioState[0] == 1 && marioState[1] == 1){
