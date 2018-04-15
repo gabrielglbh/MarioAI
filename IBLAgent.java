@@ -60,21 +60,24 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     int tick;
     int count = 0;
     int[] sectionAttrs = new int[5];
-    
+
     Instancia[][] baseConoc;
 
     public IBLAgent() {
-        super("P1BotAgentEntrega");
+        super("IBLAgent");
         reset();
         tick = 0;
         try{
           baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
-          P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
+          P2FileWriterData.fich[0] = new FileWriter("ejemplos.csv",true);
+          P2FileWriterData.fich[1] = new FileWriter("S1.csv",true);
+          P2FileWriterData.fich[2] = new FileWriter("S2.csv",true);
+          P2FileWriterData.fich[3] = new FileWriter("S3.csv",true);
+          P2FileWriterData.fich[4] = new FileWriter("S4.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
         }
-        System.out.println("U mom gay " + baseConoc[3][150].reward);
     }
 
     public void reset() {
@@ -163,11 +166,11 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         dataMatrix[17] = blocksInScreen;
         dataMatrix[18] = enemiesInScreen;
         dataMatrix[19] = reward;
-        
+
         // Atributos de las secciones del entorno cercano de Mario
         int enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
         int mz = 0;
-        
+
         // SECCION A: NUMERO DE ENEMIGOS
         enemiesSectionA = 0;
         for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
@@ -239,30 +242,86 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         // os dareis cuenta que si manteneis pulsado todo el tiempo el boton de saltar, Mario no salta todo el tiempo sino una
         // unica vez en el momento en que se pulsa. Para volver a saltar debeis despulsarlo (action[Mario.KEY_JUMP] = false),
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
-    	
+
     	////////////// FUNCION DE PERTENENCIA //////////////
     	float pertenencia;
     	/* sectionAttrs:
     	 * enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
     	 */
-    	pertenencia = (float) 50*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 3*sectionAttrs[2]
+    	pertenencia = (float) 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
     					- 2*sectionAttrs[3] + sectionAttrs[4];
+
     	int situ = -1;
-    	if(pertenencia < 50){    // Mario en el aire
-    		if(pertenencia < 25) situ = 0;
+    	if(pertenencia < 48){    // Mario en el aire
+    		if(pertenencia < 0) situ = 0;
     		else situ = 1;
-    	} else {                 // Mario en el suelo
-    		if(pertenencia < 75) situ = 2;
+    	}
+      else {                 // Mario en el suelo
+    		if(pertenencia < 100) situ = 2;
     		else situ = 3;
     	}
 
     	////////////// FUNCION DE SIMILITUD //////////////
     	Instancia[] instSimilares = new Instancia[10];
-//    	for(int ii = 0; ii < baseConoc[situ].length; ii++){
-//    		baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0];
-//    	}
-    	
-    	
+      int ignacion = 0;
+      int[] posInstSim = new int[200];
+      int resultadoEneSA = 0;
+      int resultadoObsSA = 0;
+      int resultadoCoiSA = 0;
+      int resultadoEneSB = 0;
+      int resultadoCoiSB = 0;
+      int similitudRes = -1;
+      //int distance[] = new int[10];
+      //int idx[] = new int[10];
+
+      for(int ii = 0; ii < baseConoc[situ].length; ii++){
+     		resultadoEneSA = Math.abs(baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0]);
+        resultadoObsSA = Math.abs(baseConoc[situ][ii].obstacleSectionA - sectionAttrs[1]);
+        resultadoCoiSA = Math.abs(baseConoc[situ][ii].coinsSectionA - sectionAttrs[2]);
+        resultadoEneSB = Math.abs(baseConoc[situ][ii].enemiesSectionB - sectionAttrs[3]);
+        resultadoCoiSB = Math.abs(baseConoc[situ][ii].coinsSectionB - sectionAttrs[4]);
+        //Funcion de similitud
+        similitudRes = resultadoEneSA + resultadoObsSA + resultadoCoiSA + resultadoEneSB + resultadoCoiSB;
+        //posInstSim[ii] = similitudRes;
+        if(similitudRes < 7 && ignacion < 10){
+          instSimilares[ignacion] = baseConoc[situ][ii];
+          ignacion++;
+        }
+      }
+
+      float distance = instSimilares[0].instEvaluation;
+      int idx = 0;
+      for(int c = 1; c < 10; c++){
+          if(instSimilares[c].instEvaluation > distance){
+              idx = c;
+              distance = instSimilares[c].instEvaluation;
+          }
+      }
+
+      action[0] = instSimilares[idx].action_left;
+      action[1] = instSimilares[idx].action_right;
+      action[2] = instSimilares[idx].action_down;
+      action[3] = instSimilares[idx].action_jump;
+      action[4] = instSimilares[idx].action_speed;
+      action[5] = instSimilares[idx].action_up;
+
+      //STACKOVERFLOW FT. IGNACIO (*clap* meme *clap* review)
+      /*distance[0] = posInstSim[0]; // igual mejor con {posInstSim[0], 0, 0, 0, 0, 0, 0, 0, 0, 0} para inicializar todo de una
+      idx[0] = 0; // seguramente mejor con {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+      for(int cc = 1; cc < posInstSim.length; cc++){
+          for(int ii = 0; ii < distance.length; ii++){
+              if(posInstSim[cc] < distance[ii]){
+                  idx[ii] = cc;
+                  distance[ii] = posInstSim[cc];
+                  break;
+              }
+          }
+      }
+
+      for(int ii = 0; ii < distance.length; ii++)
+      instSimilares[ii] = baseConoc[situ][idx[ii]];*/
+
         count++;
         // Si Mario esta en el suelo y puede saltar, el contador se reinicia a 1
         if(marioState[0] == 1 && marioState[1] == 1){

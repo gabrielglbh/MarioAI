@@ -14,7 +14,7 @@ import ch.idsia.agents.controllers.Instancia;
 
 public class P2FileWriterData{
   //Variables globales para el fichero de ejemplos.txt
-  static FileWriter fich = null;
+  static FileWriter[] fich = new FileWriter[5];
   static BufferedReader br = null;
   static File file = null;
 
@@ -40,7 +40,7 @@ public class P2FileWriterData{
   static int coinsSectionA = -1;
   static int enemiesSectionB = -1;
   static int coinsSectionB = -1;
-  
+
   /* CONSTANTES GLOBALES */
   static final int NUM_SITUACIONES = 4;
   /* 0: peligro delante estando en el aire
@@ -52,74 +52,26 @@ public class P2FileWriterData{
 
   public P2FileWriterData(){}
 
-  //No se usa en nada de momento
-  // public static void prepareFile(){
-	//   try {
-	// 	  boolean result = Files.deleteIfExists(fd.toPath());
-	// 	  //boolean result2 = fd.delete();
-	//   }
-	//   catch(Exception e) {
-	// 	  System.out.println("Error al borrar archivo de partida previa");
-	//   }
-  // }
-
-  /*public static void init_arff(){
-    try{
-      fich = new FileWriter("ejemplos.arff",true);
-      String callerClass = new Exception().getStackTrace()[2].getClassName();
-      callerClass = callerClass.substring(callerClass.lastIndexOf('.')+1);
-      fich.write("@RELATION " + callerClass + "\n\n");
-
-      for(int mx = 6; mx < 13; mx++) for(int my = 6; my < 13; my++){
-        fich.write("@ATTRIBUTE pos_environment_[" + mx + "_" + my + "] NUMERIC \n");
-      }
-
-      fich.write("@ATTRIBUTE reward NUMERIC \n");
-
-      fich.write("@ATTRIBUTE isMarioOnGround NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioAbleToJump NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioAbleToShoot NUMERIC \n");
-      fich.write("@ATTRIBUTE isMarioCarrying NUMERIC \n");
-
-      fich.write("@ATTRIBUTE reward_tick_n6 NUMERIC \n");
-      fich.write("@ATTRIBUTE reward_tick_n12 NUMERIC \n");
-      fich.write("@ATTRIBUTE reward_tick_n24 NUMERIC \n");
-
-      fich.write("@ATTRIBUTE ticks_in_air NUMERIC %%%%%% 1 cuando se puede volver a saltar \n");
-
-      fich.write("@ATTRIBUTE KEY_LEFT {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_RIGHT {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_DOWN {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_JUMP {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_SPEED {true, false} \n");
-      fich.write("@ATTRIBUTE KEY_UP {true, false} \n");
-
-      fich.write("\n@data \n");
-    }
-    catch(IOException e){
-        e.printStackTrace(System.out);
-    }
-  }*/
   public static Instancia[][] leerBaseConoc(String ruta){
 	  Instancia[][] baseConoc = new Instancia[NUM_SITUACIONES][NUM_INST_POR_SITU];
 	  String csvFile = ruta;
       BufferedReader br = null;
       String lineaCsv = "";
       int situ = 0, counter = 0;
-      
-	  try{         
-          br = new BufferedReader(new FileReader(csvFile));  
+
+	  try{
+          br = new BufferedReader(new FileReader(csvFile));
           // Recorre el fichero hasta el final
           while ((lineaCsv = br.readLine()) != null) {
         	  // Lee una linea hasta que llegue al separador o llene las instancias
-        	  if(lineaCsv.compareTo("%") != 0 
+        	  if(lineaCsv.compareTo("%") != 0
         			  && counter < NUM_INST_POR_SITU && situ < NUM_SITUACIONES){
         		  baseConoc[situ][counter] = new Instancia(lineaCsv);
         		  counter++;
         	  } else{
         		  situ++;
         		  counter = 0;
-        	  } 	  
+        	  }
           }
           br.close();
 	  }
@@ -131,7 +83,7 @@ public class P2FileWriterData{
 
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
-  public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, int[] marioState, 
+  public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, int[] marioState,
 		  							int ticks_in_air, int[] sectionAttrs, boolean[] action, int tick ){
 
 	  //if (tick < 2) System.out.println("Tick: " + tick);
@@ -209,7 +161,7 @@ public class P2FileWriterData{
     myInstance.add(instancia);
 
     /*
-      Se añade la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
+      Se aï¿½ade la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
       Asi, en el tick = 6 (future[6]) sabemos cuanto ha aumentado la recompensa en ese espacio de tiempo.
     */
     futureCoins[tick - 1] = dataMatrix[12]; // coins
@@ -222,23 +174,15 @@ public class P2FileWriterData{
       futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
       futureAttrsIncrement[1] = futureMode[count +12] - futureMode[count]; // Mode n+12
       futureAttrsIncrement[2] = futureDistance[count +12] - futureDistance[count]; // Distance n+12
-       
-      //////////// Valor de evaluación de la instancia ////////////
+
+      //////////// Valor de evaluaciï¿½n de la instancia ////////////
       float instEvaluation;
       instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
     		 + 10*futureAttrsIncrement[2] ;
-      
+
 
       //Escribir en el fichero toda una instacia
       try {
-          //file = new File("ejemplos.arff");
-          //br = new BufferedReader(new FileReader("ejemplos.arff"));
-
-          // Establecer Header de fichero arff ï¿½nicamente en el primer tick
-          // Si no existe el fichero o existe y estï¿½ vacï¿½o
-          //System.out.println("Pedazo de imbecil: "+file.exists()+br.readLine());
-          //if(!file.exists() || br.readLine() == null) init_arff();
-
           //Sacar el head-tick de la cola y concatenarlo con futureAttributes
           String[] instanciaActual = myInstance.poll();
           // + 1 de instEvaluation
@@ -257,21 +201,45 @@ public class P2FileWriterData{
               for(int my = 0; my < futureAttrsIncrement.length; my++){
                 instanciaCompleta[a+my] = String.valueOf(futureAttrsIncrement[my]);
               }
-              
+
               // Poner la action al final de la instancia
               for(int ii = 6; ii > 0; ii--){
             	  instanciaCompleta[instanciaCompleta.length - ii - 1] = instanciaActual[instanciaActual.length - ii];
               }
-              
+
               instanciaCompleta[instanciaCompleta.length - 1] = String.valueOf(instEvaluation);
               break;
             }
           }
 
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
-              if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ",");
-              else fich.write(instanciaCompleta[ii] + " \n");
+              if(ii != instanciaCompleta.length-1) fich[0].write(instanciaCompleta[ii] + ",");
+              else fich[0].write(instanciaCompleta[ii] + " \n");
           }
+
+          ////////////// FUNCION DE PERTENENCIA //////////////
+        	float pertenencia;
+        	/* sectionAttrs:
+        	 * enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+        	 */
+        	pertenencia = (float) 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
+        					- 2*sectionAttrs[3] + sectionAttrs[4];
+
+        	int situ = -1;
+        	if(pertenencia < 48){    // Mario en el aire
+        		if(pertenencia < 0) situ = 1;
+        		else situ = 2;
+        	}
+          else {                 // Mario en el suelo
+        		if(pertenencia < 100) situ = 3;
+        		else situ = 4;
+        	}
+
+          for(int ii = 0; ii < instanciaCompleta.length; ii++){
+              if(ii != instanciaCompleta.length-1) fich[situ].write(instanciaCompleta[ii] + ",");
+              else fich[situ].write(instanciaCompleta[ii] + " \n");
+          }
+
           count++; // Se actualiza el indice de ticks de future y futureAttrib
 
       }
@@ -285,8 +253,7 @@ public class P2FileWriterData{
   public static void close_arff(){
     try{
       if(file.exists()){
-        fich.write("\n %%%%%%%%%%%% FIN DE EJECUCION %%%%%%%%%% \n\n");
-        fich.close();
+        for(int ii = 0; ii < 5; ii++) fich[ii].close();
       }
     }
     catch(Exception e){

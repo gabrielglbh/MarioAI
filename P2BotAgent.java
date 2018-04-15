@@ -60,7 +60,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     int tick;
     int count = 0;
     int[] sectionAttrs = new int[5];
-    
+
     Instancia[][] baseConoc;
 
     public P2BotAgent() {
@@ -69,7 +69,11 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         tick = 0;
         try{
           //baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
-          P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
+          P2FileWriterData.fich[0] = new FileWriter("ejemplos.csv",true);
+          P2FileWriterData.fich[1] = new FileWriter("S1.csv",true);
+          P2FileWriterData.fich[2] = new FileWriter("S2.csv",true);
+          P2FileWriterData.fich[3] = new FileWriter("S3.csv",true);
+          P2FileWriterData.fich[4] = new FileWriter("S4.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
@@ -162,11 +166,11 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
         dataMatrix[17] = blocksInScreen;
         dataMatrix[18] = enemiesInScreen;
         dataMatrix[19] = reward;
-        
+
         // Atributos de las secciones del entorno cercano de Mario
         int enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
         int mz = 0;
-        
+
         // SECCION A: NUMERO DE ENEMIGOS
         enemiesSectionA = 0;
         for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){

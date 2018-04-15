@@ -72,10 +72,10 @@ public class Instancia {
 	boolean action_speed;
 	boolean action_up;
 	float instEvaluation;
-	
+
 	public Instancia(String instanciaCompleta) {
-		String[] atributos = instanciaCompleta.split(",");
-		
+		String[] atributos = instanciaCompleta.split("\t");
+
 		pos_6_6 = atributos[0];
 		pos_6_7 = atributos[1];
 		pos_6_8 = atributos[2];

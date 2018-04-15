@@ -44,10 +44,10 @@ import ch.idsia.agents.controllers.P2FileWriterData;
  * Package: ch.idsia.controllers.agents.controllers;
  */
 public final class P2HumanAgent extends KeyAdapter implements Agent {
-	
+
     private boolean[] Action    = null;
     private String Name         = "HumanAgent";
-    
+
     int[] dataMatrix = new int[20]; // Matriz de información de la partida en cada tick
     byte[][] envi = new byte[19][19];
     float[] posMario;
@@ -60,7 +60,7 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
     int tick;
     int count = 0;
     int[] sectionAttrs = new int[5];
-    
+
     Instancia[][] baseConoc;
 
     public P2HumanAgent()
@@ -69,7 +69,11 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         tick = 0;
         try{
         	//baseConoc = P2FileWriterData.leerBaseConoc("/baseConocimiento.csv");
-          P2FileWriterData.fich = new FileWriter("ejemplos.csv",true);
+					P2FileWriterData.fich[0] = new FileWriter("ejemplos.csv",true);
+					P2FileWriterData.fich[1] = new FileWriter("S1.csv",true);
+					P2FileWriterData.fich[2] = new FileWriter("S2.csv",true);
+					P2FileWriterData.fich[3] = new FileWriter("S3.csv",true);
+					P2FileWriterData.fich[4] = new FileWriter("S4.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
@@ -99,11 +103,11 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
     public void integrateObservation(Environment environment)
     {
           tick++;
-          
+
           coinsInScreen = 0;
           blocksInScreen = 0;
           enemiesInScreen = 0;
-          
+
         // INFORMACION DEL ENTORNO
     	// Devuelve un array de 19x19 donde Mario ocupa la posicion 9,9 con la union de los dos arrays
         // anteriores, es decir, devuelve en un mismo array la informacion de los elementos de la
@@ -140,15 +144,15 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         } // dataMatrix: 2 posiciones ocupadas
 
         // Estado de mario
-        // marioStatus, marioMode, 
-        // ** isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0), 
-        //    isMarioAbleToShoot (1 o 0),isMarioCarrying (1 o 0), 
+        // marioStatus, marioMode,
+        // ** isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0),
+        //    isMarioAbleToShoot (1 o 0),isMarioCarrying (1 o 0),
         // **
         // killsTotal, killsByFire,  killsByStomp, killsByShell, timeLeft
         //System.out.println("\nESTADO MARIO");
         marioState = new int[4];
         int[] marioState_temp = environment.getMarioState();
-        
+
         marioState[0] = marioState_temp[2];
         marioState[1] = marioState_temp[3];
         marioState[2] = marioState_temp[4];
@@ -173,11 +177,11 @@ public final class P2HumanAgent extends KeyAdapter implements Agent {
         dataMatrix[17] = blocksInScreen;
         dataMatrix[18] = enemiesInScreen;
         dataMatrix[19] = reward;
-        
+
         // Atributos de las secciones del entorno cercano de Mario
         int enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
         int mz = 0;
-        
+
         // SECCION A: NUMERO DE ENEMIGOS
         enemiesSectionA = 0;
         for(int ii = 6; ii < 10; ii++) for(int jj = 9; jj < 13; jj++){
