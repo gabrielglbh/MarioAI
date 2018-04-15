@@ -244,11 +244,11 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         // y volverlo a pulsar (action[Mario.KEY_JUMP] = true).
 
     	////////////// FUNCION DE PERTENENCIA //////////////
-    	float pertenencia;
+    	int pertenencia = 0;
     	/* sectionAttrs:
     	 * enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
     	 */
-    	pertenencia = (float) 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
+    	pertenencia = 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
     					- 2*sectionAttrs[3] + sectionAttrs[4];
 
     	int situ = -1;
@@ -257,8 +257,8 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     		else situ = 1;
     	}
       else {                 // Mario en el suelo
-    		if(pertenencia < 100) situ = 2;
-    		else situ = 3;
+    		if(pertenencia > 100) situ = 3;
+    		else situ = 2;
     	}
 
     	////////////// FUNCION DE SIMILITUD //////////////
@@ -274,7 +274,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
       //int distance[] = new int[10];
       //int idx[] = new int[10];
 
-      for(int ii = 0; ii < baseConoc[situ].length; ii++){
+      for(int ii = 0; ii < baseConoc[0].length; ii++){
      		resultadoEneSA = Math.abs(baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0]);
         resultadoObsSA = Math.abs(baseConoc[situ][ii].obstacleSectionA - sectionAttrs[1]);
         resultadoCoiSA = Math.abs(baseConoc[situ][ii].coinsSectionA - sectionAttrs[2]);

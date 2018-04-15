@@ -55,17 +55,16 @@ public class P2FileWriterData{
   public static Instancia[][] leerBaseConoc(String ruta){
 	  Instancia[][] baseConoc = new Instancia[NUM_SITUACIONES][NUM_INST_POR_SITU];
 	  String csvFile = ruta;
-      BufferedReader br = null;
-      String lineaCsv = "";
-      int situ = 0, counter = 0;
+    BufferedReader br = null;
+    String lineaCsv = "";
+    int situ = 0, counter = 0;
 
 	  try{
           br = new BufferedReader(new FileReader(csvFile));
           // Recorre el fichero hasta el final
           while ((lineaCsv = br.readLine()) != null) {
         	  // Lee una linea hasta que llegue al separador o llene las instancias
-        	  if(lineaCsv.compareTo("%") != 0
-        			  && counter < NUM_INST_POR_SITU && situ < NUM_SITUACIONES){
+        	  if(counter < NUM_INST_POR_SITU && situ < NUM_SITUACIONES){
         		  baseConoc[situ][counter] = new Instancia(lineaCsv);
         		  counter++;
         	  } else{
@@ -218,11 +217,13 @@ public class P2FileWriterData{
           }
 
           ////////////// FUNCION DE PERTENENCIA //////////////
-        	float pertenencia;
-        	/* sectionAttrs:
-        	 * enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
-        	 */
-        	pertenencia = (float) 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
+          //DESCOMENTAR PARA CREAR BASE CONOC
+        	int pertenencia = 0;
+        	 /*sectionAttrs:
+        	 enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+           */
+
+        	pertenencia = 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
         					- 2*sectionAttrs[3] + sectionAttrs[4];
 
         	int situ = -1;
@@ -231,8 +232,8 @@ public class P2FileWriterData{
         		else situ = 2;
         	}
           else {                 // Mario en el suelo
-        		if(pertenencia < 100) situ = 3;
-        		else situ = 4;
+        		if(pertenencia > 100) situ = 4;
+        		else situ = 3;
         	}
 
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
