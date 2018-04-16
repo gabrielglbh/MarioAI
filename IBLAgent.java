@@ -68,12 +68,8 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         reset();
         tick = 0;
         try{
-          baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
+          //baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
           P2FileWriterData.fich[0] = new FileWriter("ejemplos.csv",true);
-          P2FileWriterData.fich[1] = new FileWriter("S1.csv",true);
-          P2FileWriterData.fich[2] = new FileWriter("S2.csv",true);
-          P2FileWriterData.fich[3] = new FileWriter("S3.csv",true);
-          P2FileWriterData.fich[4] = new FileWriter("S4.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
@@ -262,7 +258,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     	}
 
     	////////////// FUNCION DE SIMILITUD //////////////
-    	Instancia[] instSimilares = new Instancia[10];
+    	Instancia[] instSimilares = new Instancia[3];
       int ignacion = 0;
       int[] posInstSim = new int[200];
       int resultadoEneSA = 0;
@@ -283,7 +279,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         //Funcion de similitud
         similitudRes = resultadoEneSA + resultadoObsSA + resultadoCoiSA + resultadoEneSB + resultadoCoiSB;
         //posInstSim[ii] = similitudRes;
-        if(similitudRes < 7 && ignacion < 10){
+        if(similitudRes < 7 && ignacion < 3){
           instSimilares[ignacion] = baseConoc[situ][ii];
           ignacion++;
         }
@@ -291,7 +287,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
 
       float distance = instSimilares[0].instEvaluation;
       int idx = 0;
-      for(int c = 1; c < 10; c++){
+      for(int c = 1; c < 3; c++){
           if(instSimilares[c].instEvaluation > distance){
               idx = c;
               distance = instSimilares[c].instEvaluation;

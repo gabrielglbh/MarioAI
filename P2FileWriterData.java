@@ -27,6 +27,7 @@ public class P2FileWriterData{
 
   //Queue para luego imprimir los ticks con su debido orden
   static Queue<String[]> myInstance = new LinkedList<String[]>();
+  static Queue<Integer> mySitu = new LinkedList<Integer>();
 
   static int enemies = 0;
   static int coins = 0;
@@ -85,14 +86,15 @@ public class P2FileWriterData{
   public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, int[] marioState,
 		  							int ticks_in_air, int[] sectionAttrs, boolean[] action, int tick ){
 
+
 	  //if (tick < 2) System.out.println("Tick: " + tick);
     if(dataMatrix[10] == 0){
       P2FileWriterData.close_arff();
       return;
     }
 
-    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length;
-    length_instance = 49 +1 +marioState.length +1 +sectionAttrs.length +action.length ;
+    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length + pertenencia;
+    length_instance = 49 +1 +marioState.length +1 +sectionAttrs.length +action.length + 1;
     String[] instancia = new String[length_instance];
 
     //7x7 grid
@@ -157,6 +159,36 @@ public class P2FileWriterData{
     	mz++;
     } //mz = 64
 
+    ////////////// FUNCION DE PERTENENCIA //////////////
+    //DESCOMENTAR PARA CREAR BASE CONOC
+    int pertenencia = 0;
+     /*sectionAttrs:
+     enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+     */
+
+    pertenencia = 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
+            - 2*sectionAttrs[3] + sectionAttrs[4];
+
+    int situ = -1;
+    if(pertenencia < 48){    // Mario en el aire
+      if(pertenencia < 0){
+        situ = 1;
+      }
+      else{
+         situ = 2;
+      }
+    }
+    else {                 // Mario en el suelo
+      if(pertenencia > 100){
+        situ = 4;
+      }
+      else{
+        situ = 3;
+      }
+    }
+
+    instancia[mz] = String.valueOf(pertenencia);
+    mySitu.add(situ);
     myInstance.add(instancia);
 
     /*
@@ -190,7 +222,7 @@ public class P2FileWriterData{
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaActual.length; a++){
             //Mientras que no estemos en la ultima posicion ir a�adiendo atributos
-            if(a != instanciaActual.length - 6) instanciaCompleta[a] = instanciaActual[a];
+            if(a != instanciaActual.length - 7) instanciaCompleta[a] = instanciaActual[a];
             /*
               Si estamos en la ultima posicion de la instanciaActual, a�adir
               loa futureAttributes a la instanciaCompleta y por �ltimo a�adir
@@ -202,7 +234,7 @@ public class P2FileWriterData{
               }
 
               // Poner la action al final de la instancia
-              for(int ii = 6; ii > 0; ii--){
+              for(int ii = 7; ii > 0; ii--){
             	  instanciaCompleta[instanciaCompleta.length - ii - 1] = instanciaActual[instanciaActual.length - ii];
               }
 
@@ -216,29 +248,11 @@ public class P2FileWriterData{
               else fich[0].write(instanciaCompleta[ii] + " \n");
           }
 
-          ////////////// FUNCION DE PERTENENCIA //////////////
-          //DESCOMENTAR PARA CREAR BASE CONOC
-        	int pertenencia = 0;
-        	 /*sectionAttrs:
-        	 enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
-           */
-
-        	pertenencia = 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
-        					- 2*sectionAttrs[3] + sectionAttrs[4];
-
-        	int situ = -1;
-        	if(pertenencia < 48){    // Mario en el aire
-        		if(pertenencia < 0) situ = 1;
-        		else situ = 2;
-        	}
-          else {                 // Mario en el suelo
-        		if(pertenencia > 100) situ = 4;
-        		else situ = 3;
-        	}
+          int situAux = mySitu.poll();
 
           for(int ii = 0; ii < instanciaCompleta.length; ii++){
-              if(ii != instanciaCompleta.length-1) fich[situ].write(instanciaCompleta[ii] + ",");
-              else fich[situ].write(instanciaCompleta[ii] + " \n");
+              if(ii != instanciaCompleta.length-1) fich[situAux].write(instanciaCompleta[ii] + ",");
+              else fich[situAux].write(instanciaCompleta[ii] + " \n");
           }
 
           count++; // Se actualiza el indice de ticks de future y futureAttrib
@@ -253,9 +267,11 @@ public class P2FileWriterData{
 
   public static void close_arff(){
     try{
-      if(file.exists()){
-        for(int ii = 0; ii < 5; ii++) fich[ii].close();
-      }
+        fich[0].close();
+        fich[1].close();
+        fich[2].close();
+        fich[3].close();
+        fich[4].close();
     }
     catch(Exception e){
       e.printStackTrace(System.out);
