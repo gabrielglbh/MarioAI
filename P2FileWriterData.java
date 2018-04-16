@@ -94,11 +94,11 @@ public class P2FileWriterData{
     }
 
     // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length + pertenencia;
-    length_instance = 49 +1 +marioState.length +1 +sectionAttrs.length +action.length + 1;
+    length_instance = 1 +marioState.length +1 +sectionAttrs.length +action.length + 1;
     String[] instancia = new String[length_instance];
 
     //7x7 grid
-    for(int mx = 6; mx < 13; mx++) for(int my = 6; my < 13; my++){
+    /*for(int mx = 6; mx < 13; mx++) for(int my = 6; my < 13; my++){
         switch(envi[mx][my]){
 	        case 80:{
 	    		instancia[mz] = "Goomba";
@@ -130,7 +130,7 @@ public class P2FileWriterData{
 	        }
         }
         mz++;
-    } //mz = 49
+    } //mz = 49*/
 
     // Reward
     instancia[mz] = String.valueOf(dataMatrix[19]);

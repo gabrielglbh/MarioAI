@@ -2,7 +2,7 @@ package ch.idsia.agents.controllers;
 
 public class Instancia {
 
-	String pos_6_6;
+	/*String pos_6_6;
 	String pos_6_7;
 	String pos_6_8;
 	String pos_6_9;
@@ -50,7 +50,7 @@ public class Instancia {
 	String pos_12_9;
 	String pos_12_10;
 	String pos_12_11;
-	String pos_12_12;
+	String pos_12_12;*/
 	int reward;
 	boolean isMarioOnGround;
 	boolean isMarioAbleToJump;
@@ -76,7 +76,7 @@ public class Instancia {
 	public Instancia(String instanciaCompleta) {
 		String[] atributos = instanciaCompleta.split("\t");
 
-		pos_6_6 = atributos[0];
+		/*pos_6_6 = atributos[0];
 		pos_6_7 = atributos[1];
 		pos_6_8 = atributos[2];
 		pos_6_9 = atributos[3];
@@ -124,7 +124,7 @@ public class Instancia {
 		pos_12_9 = atributos[45];
 		pos_12_10 = atributos[46];
 		pos_12_11 = atributos[47];
-		pos_12_12 = atributos[48];
+		pos_12_12 = atributos[48];*/
 		reward = Integer.parseInt(atributos[49]);
 		isMarioOnGround = atributos[50].compareTo("1") == 0 ? true : false;
 		isMarioAbleToJump = atributos[51].compareTo("1") == 0 ? true : false;

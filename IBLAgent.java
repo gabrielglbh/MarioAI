@@ -68,7 +68,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         reset();
         tick = 0;
         try{
-          //baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
+          baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
           P2FileWriterData.fich[0] = new FileWriter("ejemplos.csv",true);
         }
         catch(Exception e){
@@ -259,7 +259,8 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
 
     	////////////// FUNCION DE SIMILITUD //////////////
     	Instancia[] instSimilares = new Instancia[3];
-      int ignacion = 0;
+      int[] bestInst = new int[3];
+      int simCount = 0;
       int[] posInstSim = new int[200];
       int resultadoEneSA = 0;
       int resultadoObsSA = 0;
@@ -267,10 +268,8 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
       int resultadoEneSB = 0;
       int resultadoCoiSB = 0;
       int similitudRes = -1;
-      //int distance[] = new int[10];
-      //int idx[] = new int[10];
 
-      for(int ii = 0; ii < baseConoc[0].length; ii++){
+      for(int ii = 0; ii < baseConoc[situ].length; ii++){
      		resultadoEneSA = Math.abs(baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0]);
         resultadoObsSA = Math.abs(baseConoc[situ][ii].obstacleSectionA - sectionAttrs[1]);
         resultadoCoiSA = Math.abs(baseConoc[situ][ii].coinsSectionA - sectionAttrs[2]);
@@ -278,10 +277,24 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         resultadoCoiSB = Math.abs(baseConoc[situ][ii].coinsSectionB - sectionAttrs[4]);
         //Funcion de similitud
         similitudRes = resultadoEneSA + resultadoObsSA + resultadoCoiSA + resultadoEneSB + resultadoCoiSB;
-        //posInstSim[ii] = similitudRes;
-        if(similitudRes < 7 && ignacion < 3){
-          instSimilares[ignacion] = baseConoc[situ][ii];
-          ignacion++;
+        posInstSim[ii] = similitudRes;
+      }
+
+      for(int jj = 0; jj < posInstSim.length; jj++){
+        if(posInstSim[jj] < 7){
+          if(simCount > 3){ //Array llena, sobreescribir peor instancia
+            for(int kk = 0; kk < bestInst.length; kk++){
+              if(bestInst[kk] > posInstSim[jj]){
+                instSimilares[kk] = baseConoc[situ][jj];
+                bestInst[kk] = posInstSim[jj];
+              }
+            }
+          }
+        }
+        else{ //Array no rellenada
+          instSimilares[simCount] = baseConoc[situ][jj];
+          bestInst[simCount] = similitudRes;
+          simCount++;
         }
       }
 
@@ -300,23 +313,6 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
       action[3] = instSimilares[idx].action_jump;
       action[4] = instSimilares[idx].action_speed;
       action[5] = instSimilares[idx].action_up;
-
-      //STACKOVERFLOW FT. IGNACIO (*clap* meme *clap* review)
-      /*distance[0] = posInstSim[0]; // igual mejor con {posInstSim[0], 0, 0, 0, 0, 0, 0, 0, 0, 0} para inicializar todo de una
-      idx[0] = 0; // seguramente mejor con {0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-
-      for(int cc = 1; cc < posInstSim.length; cc++){
-          for(int ii = 0; ii < distance.length; ii++){
-              if(posInstSim[cc] < distance[ii]){
-                  idx[ii] = cc;
-                  distance[ii] = posInstSim[cc];
-                  break;
-              }
-          }
-      }
-
-      for(int ii = 0; ii < distance.length; ii++)
-      instSimilares[ii] = baseConoc[situ][idx[ii]];*/
 
         count++;
         // Si Mario esta en el suelo y puede saltar, el contador se reinicia a 1
