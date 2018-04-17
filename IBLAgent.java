@@ -258,9 +258,6 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     	}
 
     	////////////// FUNCION DE SIMILITUD //////////////
-    	Instancia[] instSimilares = new Instancia[3];
-      int[] bestInst = new int[3];
-      int simCount = 0;
       int[] posInstSim = new int[200];
       int resultadoEneSA = 0;
       int resultadoObsSA = 0;
@@ -280,9 +277,13 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         posInstSim[ii] = similitudRes;
       }
 
+      Instancia[] instSimilares = new Instancia[3];
+      int[] bestInst = new int[3];
+      int simCount = 0;
+
       for(int jj = 0; jj < posInstSim.length; jj++){
         if(posInstSim[jj] < 7){
-          if(simCount > 3){ //Array llena, sobreescribir peor instancia
+          if(simCount >= 3){ //Array llena, sobreescribir peor instancia
             for(int kk = 0; kk < bestInst.length; kk++){
               if(bestInst[kk] > posInstSim[jj]){
                 instSimilares[kk] = baseConoc[situ][jj];
@@ -290,12 +291,13 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
               }
             }
           }
+          else{ //Array no rellenada
+            instSimilares[simCount] = baseConoc[situ][jj];
+            bestInst[simCount] = similitudRes;
+            simCount++;
+          }
         }
-        else{ //Array no rellenada
-          instSimilares[simCount] = baseConoc[situ][jj];
-          bestInst[simCount] = similitudRes;
-          simCount++;
-        }
+        else continue;
       }
 
       float distance = instSimilares[0].instEvaluation;

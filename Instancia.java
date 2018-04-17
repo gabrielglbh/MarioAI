@@ -71,10 +71,11 @@ public class Instancia {
 	boolean action_jump;
 	boolean action_speed;
 	boolean action_up;
+	int pertenencia;
 	float instEvaluation;
 
 	public Instancia(String instanciaCompleta) {
-		String[] atributos = instanciaCompleta.split("\t");
+		String[] atributos = instanciaCompleta.split(",");
 
 		/*pos_6_6 = atributos[0];
 		pos_6_7 = atributos[1];
@@ -125,27 +126,28 @@ public class Instancia {
 		pos_12_10 = atributos[46];
 		pos_12_11 = atributos[47];
 		pos_12_12 = atributos[48];*/
-		reward = Integer.parseInt(atributos[49]);
-		isMarioOnGround = atributos[50].compareTo("1") == 0 ? true : false;
-		isMarioAbleToJump = atributos[51].compareTo("1") == 0 ? true : false;
-		isMarioAbleToShoot = atributos[52].compareTo("1") == 0 ? true : false;
-		isMarioCarrying = atributos[53].compareTo("1") == 0 ? true : false;
-		ticks_in_air = Integer.parseInt(atributos[54]);
-		enemiesSectionA = Integer.parseInt(atributos[55]);
-		obstacleSectionA = Integer.parseInt(atributos[56]);
-		coinsSectionA = Integer.parseInt(atributos[57]);
-		enemiesSectionB = Integer.parseInt(atributos[58]);
-		coinsSectionB = Integer.parseInt(atributos[59]);
-		incrCoins_n12 = Integer.parseInt(atributos[60]);
-		incrMode_n12 = Integer.parseInt(atributos[61]);
-		incrDistance_n12 = Integer.parseInt(atributos[62]);
-		action_left = Boolean.parseBoolean(atributos[63]); //atributos[63].compareTo("1") == 1 ? true : false;
-		action_right = Boolean.parseBoolean(atributos[64]); //atributos[64].compareTo("1") == 1 ? true : false;
-		action_down = Boolean.parseBoolean(atributos[65]);
-		action_jump = Boolean.parseBoolean(atributos[66]);
-		action_speed = Boolean.parseBoolean(atributos[67]);
-		action_up = Boolean.parseBoolean(atributos[68]);
-		instEvaluation = Float.parseFloat(atributos[69]);
+		reward = Integer.parseInt(atributos[0]);
+		isMarioOnGround = atributos[1].compareTo("1") == 0 ? true : false;
+		isMarioAbleToJump = atributos[2].compareTo("1") == 0 ? true : false;
+		isMarioAbleToShoot = atributos[3].compareTo("1") == 0 ? true : false;
+		isMarioCarrying = atributos[4].compareTo("1") == 0 ? true : false;
+		ticks_in_air = Integer.parseInt(atributos[5]);
+		enemiesSectionA = Integer.parseInt(atributos[6]);
+		obstacleSectionA = Integer.parseInt(atributos[7]);
+		coinsSectionA = Integer.parseInt(atributos[8]);
+		enemiesSectionB = Integer.parseInt(atributos[9]);
+		coinsSectionB = Integer.parseInt(atributos[10]);
+		incrCoins_n12 = Integer.parseInt(atributos[11]);
+		incrMode_n12 = Integer.parseInt(atributos[12]);
+		incrDistance_n12 = Integer.parseInt(atributos[13]);
+		action_left = Boolean.parseBoolean(atributos[14]); //atributos[63].compareTo("1") == 1 ? true : false;
+		action_right = Boolean.parseBoolean(atributos[15]); //atributos[64].compareTo("1") == 1 ? true : false;
+		action_down = Boolean.parseBoolean(atributos[16]);
+		action_jump = Boolean.parseBoolean(atributos[17]);
+		action_speed = Boolean.parseBoolean(atributos[18]);
+		action_up = Boolean.parseBoolean(atributos[19]);
+		pertenencia = Integer.parseInt(atributos[20]);
+		instEvaluation = Float.parseFloat(atributos[21]);
 	}
 
 }

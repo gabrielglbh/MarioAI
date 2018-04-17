@@ -65,7 +65,7 @@ public class P2FileWriterData{
           // Recorre el fichero hasta el final
           while ((lineaCsv = br.readLine()) != null) {
         	  // Lee una linea hasta que llegue al separador o llene las instancias
-        	  if(counter < NUM_INST_POR_SITU && situ < NUM_SITUACIONES){
+        	  if(counter < NUM_INST_POR_SITU){
         		  baseConoc[situ][counter] = new Instancia(lineaCsv);
         		  counter++;
         	  } else{
@@ -250,10 +250,10 @@ public class P2FileWriterData{
 
           int situAux = mySitu.poll();
 
-          for(int ii = 0; ii < instanciaCompleta.length; ii++){
+          /*for(int ii = 0; ii < instanciaCompleta.length; ii++){
               if(ii != instanciaCompleta.length-1) fich[situAux].write(instanciaCompleta[ii] + ",");
               else fich[situAux].write(instanciaCompleta[ii] + " \n");
-          }
+          }*/
 
           count++; // Se actualiza el indice de ticks de future y futureAttrib
 
