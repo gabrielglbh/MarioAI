@@ -38,6 +38,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class IBLAgent extends BasicMarioAIAgent implements Agent {
 
@@ -60,6 +61,8 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     int tick;
     int count = 0;
     int[] sectionAttrs = new int[5];
+    int[] sectionAttrsPrevios = new int[5];
+    int ticksUnchanged = 0;
 
     Instancia[][] baseConoc;
 
@@ -144,7 +147,7 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
         marioState[3] = marioState_temp[5]; // isMarioCarrying (1 o 0)
 
         //////// Mas informacion de evaluacion...
-        // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
+        // distancePassedCells (2), distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
         // marioStatus(10), mushroomsDevoured, coinsGained (12), timeLeft, timeSpent, hiddenBlocksFound /14
         //System.out.println("\nINFORMACION DE EVALUACION");
         int[] infoEvaluacion;
@@ -252,61 +255,93 @@ public class IBLAgent extends BasicMarioAIAgent implements Agent {
     		if(pertenencia < 0) situ = 0;
     		else situ = 1;
     	}
-      else {                 // Mario en el suelo
+    	 else {                 // Mario en el suelo
     		if(pertenencia > 100) situ = 3;
     		else situ = 2;
     	}
 
     	////////////// FUNCION DE SIMILITUD //////////////
-      int[] posInstSim = new int[200];
+    	// Guarda el valor de similitud calculado para cada instancia de la situacion actual
+      int[] similInstSitu = new int[200]; 
       int resultadoEneSA = 0;
       int resultadoObsSA = 0;
       int resultadoCoiSA = 0;
       int resultadoEneSB = 0;
       int resultadoCoiSB = 0;
-      int similitudRes = -1;
+      int similitudValor = -1;
 
+     // System.out.println(baseConoc.length +"  "+baseConoc[situ].length+" ");
       for(int ii = 0; ii < baseConoc[situ].length; ii++){
-     		resultadoEneSA = Math.abs(baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0]);
+     	resultadoEneSA = Math.abs(baseConoc[situ][ii].enemiesSectionA - sectionAttrs[0]);
         resultadoObsSA = Math.abs(baseConoc[situ][ii].obstacleSectionA - sectionAttrs[1]);
         resultadoCoiSA = Math.abs(baseConoc[situ][ii].coinsSectionA - sectionAttrs[2]);
         resultadoEneSB = Math.abs(baseConoc[situ][ii].enemiesSectionB - sectionAttrs[3]);
         resultadoCoiSB = Math.abs(baseConoc[situ][ii].coinsSectionB - sectionAttrs[4]);
-        //Funcion de similitud
-        similitudRes = resultadoEneSA + resultadoObsSA + resultadoCoiSA + resultadoEneSB + resultadoCoiSB;
-        posInstSim[ii] = similitudRes;
+        similitudValor = resultadoEneSA + resultadoObsSA + resultadoCoiSA + resultadoEneSB + resultadoCoiSB;
+        similInstSitu[ii] = similitudValor;
       }
 
-      Instancia[] instSimilares = new Instancia[3];
-      int[] bestInst = new int[3];
+      Instancia[] instSimilares = new Instancia[5];
+      int[] similBestInst = new int[5];
       int simCount = 0;
 
-      for(int jj = 0; jj < posInstSim.length; jj++){
-        if(posInstSim[jj] < 7){
-          if(simCount >= 3){ //Array llena, sobreescribir peor instancia
-            for(int kk = 0; kk < bestInst.length; kk++){
-              if(bestInst[kk] > posInstSim[jj]){
+      for(int jj = 0; jj < similInstSitu.length; jj++){
+          if(simCount >= similBestInst.length){ // Array llena, sobreescribir peor instancia
+            for(int kk = 0; kk < similBestInst.length; kk++){
+              if(similBestInst[kk] > similInstSitu[jj]){
                 instSimilares[kk] = baseConoc[situ][jj];
-                bestInst[kk] = posInstSim[jj];
+                similBestInst[kk] = similInstSitu[jj];
+                break;
               }
             }
           }
           else{ //Array no rellenada
             instSimilares[simCount] = baseConoc[situ][jj];
-            bestInst[simCount] = similitudRes;
+            similBestInst[simCount] = similitudValor;
             simCount++;
           }
-        }
-        else continue;
       }
-
-      float distance = instSimilares[0].instEvaluation;
+      
+      
+      ////////////// FUNCION DE EVALUACION //////////////
+      // Factor aleatorio para evitar bloqueos (cierta posibilidad de fallo)
+      boolean situationUnchanged = false;
+      if(tick == 1){
+    	  for(int ii = 0; ii < sectionAttrsPrevios.length; ii++){
+        	  sectionAttrsPrevios[ii] = sectionAttrs[ii];
+          } 
+      } else {
+    	  for(int ii = 0; ii < sectionAttrsPrevios.length; ii++){
+        	  if(sectionAttrsPrevios[ii] != sectionAttrs[ii]){
+        		  situationUnchanged = false;
+        		  ticksUnchanged = 0; break;
+        	  }
+        	  else situationUnchanged = true;
+          } 
+      }
+      for(int ii = 0; ii < sectionAttrsPrevios.length; ii++){
+    	  sectionAttrsPrevios[ii] = sectionAttrs[ii];
+      }
+      if(situationUnchanged) ticksUnchanged++;
+      
+      // Parte de elección de instancia, el calculo está en P2FileWriterData
+      float bestEvaluation = instSimilares[0].instEvaluation;
       int idx = 0;
-      for(int c = 1; c < 3; c++){
-          if(instSimilares[c].instEvaluation > distance){
+      for(int c = 1; c < instSimilares.length; c++){
+          if(instSimilares[c].instEvaluation > bestEvaluation){
               idx = c;
-              distance = instSimilares[c].instEvaluation;
+              bestEvaluation = instSimilares[c].instEvaluation;
           }
+      }
+      if(ticksUnchanged >= 18) {
+    	  System.out.println("SectAttrs: " + instSimilares[idx].enemiesSectionA
+        		  + " " + instSimilares[idx].obstacleSectionA
+        		  + " " + instSimilares[idx].coinsSectionA
+        		  + " " + instSimilares[idx].enemiesSectionB
+        		  + " " + instSimilares[idx].coinsSectionB
+        		  + "; rew " + instSimilares[idx].reward
+        		  + "; pert " + instSimilares[idx].pertenencia);
+    	  idx = ThreadLocalRandom.current().nextInt(0, instSimilares.length);
       }
 
       action[0] = instSimilares[idx].action_left;

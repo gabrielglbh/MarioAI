@@ -64,7 +64,7 @@ public class P2BotAgent extends BasicMarioAIAgent implements Agent {
     Instancia[][] baseConoc;
 
     public P2BotAgent() {
-        super("P1BotAgentEntrega");
+        super("P2BotAgentEntrega");
         reset();
         tick = 0;
         try{

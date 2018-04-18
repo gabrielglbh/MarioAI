@@ -71,6 +71,8 @@ public class P2FileWriterData{
         	  } else{
         		  situ++;
         		  counter = 0;
+        		  baseConoc[situ][counter] = new Instancia(lineaCsv);
+        		  counter++;
         	  }
           }
           br.close();
@@ -93,8 +95,8 @@ public class P2FileWriterData{
       return;
     }
 
-    // +49: Grid; +1: reward; +4: Status; +1: ticks_in_air; +5: section_Attrs; +action.length + pertenencia;
-    length_instance = 1 +marioState.length +1 +sectionAttrs.length +action.length + 1;
+    // +1: reward; +1: ticks_in_air;  +1: pertenencia; +1: distancePassedCells
+    length_instance = 1 + 1 + marioState.length +1 +sectionAttrs.length +action.length + 1;
     String[] instancia = new String[length_instance];
 
     //7x7 grid
@@ -134,6 +136,9 @@ public class P2FileWriterData{
 
     // Reward
     instancia[mz] = String.valueOf(dataMatrix[19]);
+    mz++; //mz = 50
+    // Distance Passed Cells
+    instancia[mz] = String.valueOf(dataMatrix[2]);
     mz++; //mz = 50
 
     instancia[mz] = String.valueOf(marioState[0]);
