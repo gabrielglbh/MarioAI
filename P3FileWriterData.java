@@ -23,6 +23,17 @@ public class P3FileWriterData{
   static int[] futureMode = new int[3000];
   static int[] futureDistance = new int[3000];
 
+  static final int enemiesSectA = 0;
+  static final int obstacSectA = 1;
+  static final int coinsSectA = 2;
+  static final int enemiesSectB = 3;
+  static final int coinsSectB = 4;
+  static final int enemiesSectC = 5;
+  static final int obstacSectC = 6;
+  static final int coinsSectC = 7;
+  static final int enemiesSectD = 8;
+  static final int coinsSectD = 9;
+
   static int[] futureAttrsIncrement = new int[3]; //3 for reward n+6,+12,+24; 3 for distance n+6,+12,+24;
 
   //Queue para luego imprimir los ticks con su debido orden
@@ -45,12 +56,12 @@ public class P3FileWriterData{
   /* CONSTANTES GLOBALES */
   // Situaciones en las que clasificar cada estado, cada una tiene una fila en la TablaQ
   static final int NUM_SITUACIONES = -1;
-  /* 0: 
-   * 1: 
-   * 2: 
-   * 3: 
+  /* 0:
+   * 1:
+   * 2:
+   * 3:
    */
-  // Esto ahora mismo no sirve, habría que cambiarlo por el número de acciones que consideramos
+  // Esto ahora mismo no sirve, habrï¿½a que cambiarlo por el nï¿½mero de acciones que consideramos
   static final int NUM_INST_POR_SITU = 200;
 
   public P3FileWriterData(){}
@@ -103,7 +114,7 @@ public class P3FileWriterData{
     // Reward
     instancia[mz] = String.valueOf(dataMatrix[19]);
     mz++; //mz = 50
-    
+
     // Distance Passed Cells
     //instancia[mz] = String.valueOf(dataMatrix[2]);
     //mz++; //mz = 50
@@ -138,35 +149,47 @@ public class P3FileWriterData{
      enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB,
      enemiesSectionC, obstacleSectionC, coinsSectionC, enemiesSectionD, coinsSectionD;
      */
-	
+
 	int situ = 0;
-	
-	/* SECTION A Y B */
-	if ((sectionAttrs[0] > 0 || sectionAttrs[1] > 0 || sectionAttrs[3] > 0) && marioState[0] == 1){
-		situ = 0; //Mario en el suelo y obstaculo o goomba
-	}
-	else if ((sectionAttrs[5] > 0 || sectionAttrs[6] > 0 || sectionAttrs[8] > 0) && marioState[0] == 1){
-		situ = 5; //Mario en el suelo y obstaculo o goomba
-	}
-	else if ((sectionAttrs[0] <= 0 || sectionAttrs[1] <= 0 || sectionAttrs[3] <= 0) && marioState[0] == 1 && (sectionAttrs[2] > 0 && sectionAttrs[4] > 0)){
-		situ = 1; //Mario en el suelo y monedas
-	}
-	else if ((sectionAttrs[0] > 0 || sectionAttrs[1] > 0 || sectionAttrs[3] > 0) && marioState[0] == 0){
-		situ = 3; //Mario en el aire y obstaculo o goomba
-	}
-	else if ((sectionAttrs[5] > 0 || sectionAttrs[6] > 0 || sectionAttrs[8] > 0) && marioState[0] == 0){
-		situ = 7; //Mario en el aire y obstaculo o goomba
-	}
-	else if ((sectionAttrs[0] <= 0 || sectionAttrs[1] <= 0 || sectionAttrs[3] <= 0) && marioState[0] == 0 && (sectionAttrs[2] > 0 && sectionAttrs[4] > 0)){
-		situ = 4; //Mario en el aire y monedas
-	}
-	else if ((sectionAttrs[5] <= 0 || sectionAttrs[6] <= 0 || sectionAttrs[8] <= 0) && marioState[0] == 1 && (sectionAttrs[7] > 0 && sectionAttrs[9] > 0)){
-		situ = 6; //Mario en el suelo y monedas
-	}
-	else{
-		situ = 8; //Mario en el aire y monedas
-	}
-	
+
+    //mario suelo y enemigo delante
+    if(sectionAttrs[enemiesSectA] > 0 && marioState[0] == 1){
+      situ = 0;
+    }
+
+    //mario saltando y enemigo debajo
+    else if(sectionAttrs[enemiesSectB] > 0 && marioState[0] == 0){
+      situ = 1;
+    }
+
+    //mario suelo y monedas delante
+    else if(sectionAttrs[coinsSectA] > 0 && marioState[0] == 1){
+      situ = 2;
+    }
+
+    //mario saltando y monedas debajo o delante
+    else if((sectionAttrs[coinsSectB] > 0 || sectionAttrs[coinsSectA] > 0) && marioState[0] == 0){
+      situ = 3;
+    }
+
+    //mario suelo y obstauclo delante
+    else if(sectionAttrs[obstacSectA] > 0 && marioState[0] == 1){
+      situ = 4;
+    }
+
+    //mario saltando y obstaculo delante
+    else if(sectionAttrs[obstacSectA] > 0 && marioState[0] == 0){
+      situ = 5;
+    }
+
+    //mario saltando y enemigo por atrÃ¡s y debajo
+    else if((sectionAttrs[enemiesSectC] > 0 || sectionAttrs[enemiesSectD] > 0 ) && marioState[0] == 0){
+      situ = 6;
+    }
+    else{
+      situ = 7;
+    }
+
     //mySitu.add(situ);
     myInstance.add(instancia);
 
@@ -189,13 +212,16 @@ public class P3FileWriterData{
       float instEvaluation;
       instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
     		 + 10*futureAttrsIncrement[2] ;
+
       if (instEvaluation < 0.0) instEvaluation = 0.0f;
+      //Si estÃ¡ blocked...
+      else if(futureAttrsIncrement[2] == 0) instEvaluation = -1.0f;
 
       //Escribir en el fichero toda una instacia
       try {
           String[] instanciaActual = myInstance.poll();
           // + 1 de instEvaluation
-          String[] instanciaCompleta = 
+          String[] instanciaCompleta =
         		  new String[instanciaActual.length + (instancia.length - 1) + 1];
 
           //Establcemos la instanciaCompleta...
