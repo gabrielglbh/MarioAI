@@ -88,7 +88,7 @@ public class P3FileWriterData{
   //Metodo auxiliar en Environment class para facilitar el entendimiento del codigo
   //Escribir en fichero los datos de los ticks
   public static void writeOnFile( byte[][] envi, float[] posMario, int[] dataMatrix, int[] marioState,
-		  							int ticks_in_air, int[] sectionAttrs, boolean[] name_actions, int tick ){
+		  							int ticks_in_air, int[] sectionAttrs, int actionCode, int tick ){
 
 
     if(dataMatrix[10] == 0){
@@ -96,8 +96,8 @@ public class P3FileWriterData{
       return;
     }
 
-    // +1: reward; +1: distancePassedCells; +1: ticks_in_air;  +1: pertenencia; 
-    length_instance = 1 + marioState.length + 1 +  sectionAttrs.length + name_actions.length;
+    // +1: reward; +1: distancePassedCells; +1: ticks_in_air;  +1: pertenencia; +1: actionCode;
+    length_instance = 1 + marioState.length + 1 +  sectionAttrs.length + 1;
     String[] instancia = new String[length_instance];
 
     // Reward
@@ -108,6 +108,8 @@ public class P3FileWriterData{
     //instancia[mz] = String.valueOf(dataMatrix[2]);
     //mz++; //mz = 50
 
+    // ** isMarioOnGround (1 o 0), isMarioAbleToJump() (1 o 0),
+    //    isMarioAbleToShoot (1 o 0),isMarioCarrying (1 o 0),
     instancia[mz] = String.valueOf(marioState[0]);
     mz++;
     instancia[mz] = String.valueOf(marioState[1]);
@@ -126,36 +128,45 @@ public class P3FileWriterData{
     }
 
     // Action
-    for(int mx = 0; mx < name_actions.length; mx++){
-    	instancia[mz] = String.valueOf(name_actions[mx]);
-    	mz++;
-    } //mz = 64
+	instancia[mz] = String.valueOf(actionCode);
+	mz++;
+     //mz = 64
 
     ////////////// FUNCION DE PERTENENCIA //////////////
-    //DESCOMENTAR PARA CREAR BASE CONOC
     //int pertenencia = 0;
      /*sectionAttrs:
-     enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB;
+     enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB,
+     enemiesSectionC, obstacleSectionC, coinsSectionC, enemiesSectionD, coinsSectionD;
      */
-
-   /* pertenencia = 100*marioState[0] + -4*(sectionAttrs[0] + sectionAttrs[1]) + 5*sectionAttrs[2]
-            - 2*sectionAttrs[3] + sectionAttrs[4];
-
-    int situ = -1;
-    if(pertenencia < 48){    // Mario en el aire
-      if(pertenencia < 0)
-        situ = 1;
-      else
-         situ = 2;
-    }
-    else {                 // Mario en el suelo
-      if(pertenencia > 100)
-        situ = 4;
-      else
-        situ = 3;
-    }
-
-    instancia[mz] = String.valueOf(pertenencia);*/
+	
+	int situ = 0;
+	
+	/* SECTION A Y B */
+	if ((sectionAttrs[0] > 0 || sectionAttrs[1] > 0 || sectionAttrs[3] > 0) && marioState[0] == 1){
+		situ = 0; //Mario en el suelo y obstaculo o goomba
+	}
+	else if ((sectionAttrs[5] > 0 || sectionAttrs[6] > 0 || sectionAttrs[8] > 0) && marioState[0] == 1){
+		situ = 5; //Mario en el suelo y obstaculo o goomba
+	}
+	else if ((sectionAttrs[0] <= 0 || sectionAttrs[1] <= 0 || sectionAttrs[3] <= 0) && marioState[0] == 1 && (sectionAttrs[2] > 0 && sectionAttrs[4] > 0)){
+		situ = 1; //Mario en el suelo y monedas
+	}
+	else if ((sectionAttrs[0] > 0 || sectionAttrs[1] > 0 || sectionAttrs[3] > 0) && marioState[0] == 0){
+		situ = 3; //Mario en el aire y obstaculo o goomba
+	}
+	else if ((sectionAttrs[5] > 0 || sectionAttrs[6] > 0 || sectionAttrs[8] > 0) && marioState[0] == 0){
+		situ = 7; //Mario en el aire y obstaculo o goomba
+	}
+	else if ((sectionAttrs[0] <= 0 || sectionAttrs[1] <= 0 || sectionAttrs[3] <= 0) && marioState[0] == 0 && (sectionAttrs[2] > 0 && sectionAttrs[4] > 0)){
+		situ = 4; //Mario en el aire y monedas
+	}
+	else if ((sectionAttrs[5] <= 0 || sectionAttrs[6] <= 0 || sectionAttrs[8] <= 0) && marioState[0] == 1 && (sectionAttrs[7] > 0 && sectionAttrs[9] > 0)){
+		situ = 6; //Mario en el suelo y monedas
+	}
+	else{
+		situ = 8; //Mario en el aire y monedas
+	}
+	
     //mySitu.add(situ);
     myInstance.add(instancia);
 
@@ -167,25 +178,25 @@ public class P3FileWriterData{
     futureMode[tick - 1] = dataMatrix[9]; // status (if it was hit by an enemy)
     futureDistance[tick - 1] = dataMatrix[2]; // DistancePassedCells
 
-    //Empieza la chicha cuando el tick 24 ocurre (empieza a escribir en este tick en el fichero)
+    // Empieza la chicha cuando el tick 12 ocurre (empieza a escribir en este tick en el fichero)
     if(tick > 12){
       /* Aqui se calcula el valor dentro de 12 ticks de monedas recogidas, status de Mario y distancia recorrida*/
-     /* futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
+      futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
       futureAttrsIncrement[1] = futureMode[count +12] - futureMode[count]; // Mode n+12
-      futureAttrsIncrement[2] = futureDistance[count +12] - futureDistance[count]; // Distance n+12*/
+      futureAttrsIncrement[2] = futureDistance[count +12] - futureDistance[count]; // Distance n+12
 
       //////////// Valor de evaluacion de la instancia ////////////
       float instEvaluation;
       instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
     		 + 10*futureAttrsIncrement[2] ;
-
+      if (instEvaluation < 0.0) instEvaluation = 0.0f;
 
       //Escribir en el fichero toda una instacia
       try {
           String[] instanciaActual = myInstance.poll();
           // + 1 de instEvaluation
           String[] instanciaCompleta = 
-        		  new String[instanciaActual.length + (instancia.length - name_actions.length) + 1];
+        		  new String[instanciaActual.length + (instancia.length - 1) + 1];
 
           //Establcemos la instanciaCompleta...
           for(int a = 0; a < instanciaCompleta.length; a++){

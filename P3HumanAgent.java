@@ -69,7 +69,7 @@ public final class P3HumanAgent extends KeyAdapter implements Agent {
         tick = 0;
         try{
         	//baseConoc = P2FileWriterData.leerBaseConoc("/baseConocimiento.csv");
-					P3FileWriterData.fich = new FileWriter("tuplasP3_human.csv",true);
+					P3FileWriterData.fich = new FileWriter("P3human.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);
@@ -93,29 +93,23 @@ public final class P3HumanAgent extends KeyAdapter implements Agent {
    // Codificacion de la accion para la tabla Q
       /* Jump(0) - Right(1) - Left(2) - JumpRight(3) - JumpLeft(4) - RunRight(5) - RunRightJump(6) */
       boolean []name_actions = new boolean[7];
+      int actionCode = -1;
 
-      if(Action[3]) name_actions[0] = true;
-      else{name_actions[0] = false;}
+      if(Action[3]) actionCode = 0;
 
-      if(Action[1]) name_actions[1] = true;
-      else{name_actions[1] = false;}
+      if(Action[1]) actionCode = 1;
 
-      if(Action[0]) name_actions[2] = true;
-      else{name_actions[2] = false;}
+      if(Action[0]) actionCode = 2;
 
-      if(Action[3] && Action[1]) name_actions[3] = true;
-      else{name_actions[3] = false;}
+      if(Action[3] && Action[1]) actionCode = 3;
 
-      if(Action[3] && Action[0]) name_actions[4] = true;
-      else{name_actions[4] = false;}
+      if(Action[3] && Action[0]) actionCode = 4;
 
-      if(Action[1] && Action[4]) name_actions[5] = true;
-      else{name_actions[5] = false;}
+      if(Action[1] && Action[4]) actionCode = 5;
 
-      if(Action[3] && Action[1] && Action[4]) name_actions[6] = true;
-      else{name_actions[6] = false;}
+      if(Action[3] && Action[1] && Action[4]) actionCode = 6;
 
-      P3FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, sectionAttrs, name_actions, tick);
+      P3FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, sectionAttrs, actionCode, tick);
     	return Action;
     }
 
