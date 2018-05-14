@@ -75,6 +75,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
     // 8 situaciones * 6 acciones
     double[][] tablaQ = new double[8][6];
+    QLearning ql = null;
 
     public P3QLearningAgent() {
         super("P3BotAgentEntrega");
@@ -84,8 +85,8 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
         List<Tupla> mapa  = new ArrayList<Tupla>();
         String[] acciones = {"0", "1", "2", "3", "4", "-1"};
         String[] estados  = {"0", "1", "2", "3", "4", "5", "6", "7"};
+        ql        = new QLearning(0, 0.7, 0.75, estados, acciones, 8, 6);
         
-        QLearning ql        = new QLearning(0, 0.7, 0.75, estados, acciones, 8, 6);
         int ciclosMaximos   = 20, ciclos = 0;
 
         FileWriter fich = null;
@@ -424,9 +425,23 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
     			action[kk] = false;
     		}
     	}
+    	
+    	int actionCode = -1;
+        if(action[3]) actionCode = 0;
+        if(action[1]) actionCode = 1;
+        if(action[0]) actionCode = 2;
+        if(action[3] && action[1]) actionCode = 3;
+        if(action[3] && action[0]) actionCode = 4;
 
         //P3FileWriterData.writeOnFile(dataMatrix, marioState, count, sectionAttrs, name_actions, tick);
-
+    	String[] newTuplaString = P3FileWriterData.returnTupla( dataMatrix, marioState, sectionAttrs, actionCode, tick);
+    	if (newTuplaString != null){
+    		Double[] newTuplaDouble = { Double.parseDouble(newTuplaString[0]), Double.parseDouble(newTuplaString[1]), 
+    			Double.parseDouble(newTuplaString[2]), Double.parseDouble(newTuplaString[3]) };
+    		//System.out.println("Actualizando?");
+    		ql.actualizarTablaQ( new Tupla(newTuplaDouble[0], newTuplaDouble[1], newTuplaDouble[2], newTuplaDouble[3]) );
+    	}
+    	
         return action;
     }
 }

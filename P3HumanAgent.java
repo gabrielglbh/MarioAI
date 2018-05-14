@@ -69,7 +69,7 @@ public final class P3HumanAgent extends KeyAdapter implements Agent {
         tick = 0;
         try{
         	//baseConoc = P2FileWriterData.leerBaseConoc("/baseConocimiento.csv");
-					P3FileWriterData.fich = new FileWriter("P3Human.csv",true);
+			P3FileWriterData.fich = new FileWriter("P3Human.csv",true);
         }
         catch(Exception e){
           e.printStackTrace(System.out);

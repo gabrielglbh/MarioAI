@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 import ch.idsia.agents.controllers.Instancia;
+import ch.idsia.agents.controllers.qlearning.*;
 
 public class P3FileWriterData{
   //Variables globales para el fichero de ejemplos.txt
@@ -377,6 +378,132 @@ public class P3FileWriterData{
 		  }
 	  }
 	  mz = 0;
+  }  
+  
+  public static String[] returnTupla( int[] dataMatrix, int[] marioState, int[] sectionAttrs, int actionCode, int tick ){
+
+
+	  if(dataMatrix[10] == 0){
+		  P3FileWriterData.close_arff();
+		  return null;
+	  }
+
+	  // estado_actual, accion
+	  length_instance = 2;
+	  String[] instancia = new String[length_instance];
+
+	  //////////////FUNCION DE PERTENENCIA //////////////
+	  //int pertenencia = 0;
+	  /*sectionAttrs:
+		enemiesSectionA, obstacleSectionA, coinsSectionA, enemiesSectionB, coinsSectionB,
+		enemiesSectionC, obstacleSectionC, coinsSectionC, enemiesSectionD, coinsSectionD;
+	   */
+
+	  int situ = 0;
+
+	  //mario suelo y enemigo delante
+	  if(sectionAttrs[enemiesSectA] > 0 && marioState[0] == 1){
+		  situ = 0;
+	  }
+
+	  //mario saltando y enemigo debajo
+	  else if(sectionAttrs[enemiesSectB] > 0 && marioState[0] == 0){
+		  situ = 1;
+	  }
+
+	  //mario suelo y monedas delante
+	  else if(sectionAttrs[coinsSectA] > 0 && marioState[0] == 1){
+		  situ = 2;
+	  }
+
+	  //mario saltando y monedas debajo o delante
+	  else if((sectionAttrs[coinsSectB] > 0 || sectionAttrs[coinsSectA] > 0) && marioState[0] == 0){
+		  situ = 3;
+	  }
+
+	  //mario suelo y obstauclo delante
+	  else if(sectionAttrs[obstacSectA] > 0 && marioState[0] == 1){
+		  situ = 4;
+	  }
+
+	  //mario saltando y obstaculo delante
+	  else if(sectionAttrs[obstacSectA] > 0 && marioState[0] == 0){
+		  situ = 5;
+	  }
+
+	  //mario saltando y enemigo por atrás y debajo
+	  else if((sectionAttrs[enemiesSectC] > 0 || sectionAttrs[enemiesSectD] > 0 ) && marioState[0] == 0){
+		  situ = 6;
+	  }
+	  else{
+		  situ = 7;
+	  }
+	  
+	  instancia[mz] = String.valueOf(situ);
+	  mz++;
+
+	  // Action
+	  instancia[mz] = String.valueOf(actionCode);
+	  mz++;
+	  
+	  //mySitu.add(situ);
+	  myTuplas.add(instancia);
+
+	  /*
+		Se agrega la recompensa obtenida en los proximos ticks (desde ahora hasta dentro de 6, 12 y 24 ticks
+		Asi, en el tick = 6 (future[6]) sabemos cuanto ha aumentado la recompensa en ese espacio de tiempo.
+	   */
+	  futureCoins[tick - 1] = dataMatrix[12]; // coins
+	  futureMode[tick - 1] = dataMatrix[9]; // status (if it was hit by an enemy)
+	  futureDistance[tick - 1] = dataMatrix[2]; // DistancePassedCells
+
+	  // Empieza la chicha cuando el tick 12 ocurre (empieza a escribir en este tick en el fichero)
+	  if(tick > 12) {
+		  /* Aqui se calcula el valor dentro de 12 ticks de monedas recogidas, status de Mario y distancia recorrida*/
+		  futureAttrsIncrement[0] = futureCoins[count +12] - futureCoins[count]; // Coins n+12
+		  futureAttrsIncrement[1] = futureMode[count +12] - futureMode[count]; // Mode n+12
+		  futureAttrsIncrement[2] = futureDistance[count +12] - futureDistance[count]; // Distance n+12
+
+		  //////////// Valor de evaluacion de la instancia ////////////
+		  float instEvaluation;
+		  instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
+				  + 10*futureAttrsIncrement[2] ;
+		  instEvaluation /= 100.0f;
+
+		  if (instEvaluation < 0.0) instEvaluation = 0.0f;
+
+		  //Escribir en el fichero toda una instacia
+		  try {
+			  String[] instanciaInicial = myTuplas.poll();
+			  // estado_actual, accion, estado_siguiente, refuerzo
+			  String[] instanciaCompleta = new String[instanciaInicial.length + 2];
+
+			  //Establcemos la instanciaCompleta...
+			  for(int a = 0; a < instanciaCompleta.length; a++){
+				  if (a < instanciaInicial.length) instanciaCompleta[a] = instanciaInicial[a];
+				  else {
+					  instanciaCompleta[a] = instancia[a - instanciaInicial.length];
+					  if (a == instanciaCompleta.length - 1)
+						  instanciaCompleta[instanciaCompleta.length - 1] = String.valueOf(instEvaluation);
+				  }
+			  }
+
+			  /*for(int ii = 0; ii < instanciaCompleta.length; ii++){
+				  if(ii != instanciaCompleta.length-1) fich.write(instanciaCompleta[ii] + ",");
+				  else fich.write(instanciaCompleta[ii] + " \n");
+			  }*/
+			  count++; // Se actualiza el indice de ticks de future y futureAttrib (
+
+			  mz = 0;
+			  return instanciaCompleta;
+
+		  }
+		  catch(Exception e){
+			  e.printStackTrace(System.out);
+		  }
+	  }
+	  mz = 0;
+	  return null;
   }  
   
   
