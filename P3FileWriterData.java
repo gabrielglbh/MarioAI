@@ -47,21 +47,9 @@ public class P3FileWriterData{
   static int length_instance = 0; // Vestigial, se puede quitar (no me atrevo, no sea que la lie)
   static int count = 0;
 
-  /*static int enemiesSectionA = -1;
-  static int obstacleSectionA = -1;
-  static int coinsSectionA = -1;
-  static int enemiesSectionB = -1;
-  static int coinsSectionB = -1;*/
-
   /* CONSTANTES GLOBALES */
   // Situaciones en las que clasificar cada estado, cada una tiene una fila en la TablaQ
-  static final int NUM_SITUACIONES = -1;
-  /* 0:
-   * 1:
-   * 2:
-   * 3:
-   */
-  // Esto ahora mismo no sirve, habr�a que cambiarlo por el n�mero de acciones que consideramos
+  static final int NUM_SITUACIONES = 8;
   static final int NUM_INST_POR_SITU = 200;
 
   public P3FileWriterData(){}
@@ -350,6 +338,7 @@ public class P3FileWriterData{
 		  float instEvaluation;
 		  instEvaluation = (float) 5*futureAttrsIncrement[0] + 50*futureAttrsIncrement[1]
 				  + 10*futureAttrsIncrement[2] ;
+		  instEvaluation /= 100.0f;
 
 		  if (instEvaluation < 0.0) instEvaluation = 0.0f;
 

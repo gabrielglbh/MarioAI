@@ -33,12 +33,12 @@ import ch.idsia.benchmark.mario.environments.Environment;
 import ch.idsia.agents.controllers.P3FileWriterData;
 import ch.idsia.agents.controllers.Instancia;
 import ch.idsia.tools.EvaluationInfo;
-import ch.idsia.agents.controllers.qlearning.Tupla;
+import ch.idsia.agents.controllers.qlearning.*;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.util.Random;
+import java.util.*;
 
 public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
@@ -74,24 +74,66 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
     int[] sectionAttrs = new int[10];
 
     // 8 situaciones * 6 acciones
-    float[][] tablaQ = new float[8][5];
+    double[][] tablaQ = new double[8][6];
 
     public P3QLearningAgent() {
         super("P3BotAgentEntrega");
         reset();
         tick = 0;
+        
+        List<Tupla> mapa  = new ArrayList<Tupla>();
+        String[] acciones = {"0", "1", "2", "3", "4", "-1"};
+        String[] estados  = {"0", "1", "2", "3", "4", "5", "6", "7"};
+        
+        QLearning ql        = new QLearning(0, 0.7, 0.75, estados, acciones, 8, 6);
+        int ciclosMaximos   = 20, ciclos = 0;
+
+        FileWriter fich = null;
+        BufferedReader br = null;
+        String lineaCsv = "";
+        
         try{
-          //baseConoc = P2FileWriterData.leerBaseConoc("baseConocimiento.csv");
-          //P3FileWriterData.fich = new FileWriter("P3QLearn.csv",true);
+        	br = new BufferedReader(new FileReader("P3Tuplas.csv"));
+            // Recorre el fichero hasta el final
+            while ( (lineaCsv = br.readLine()) != null ) {
+                String[] tupla = lineaCsv.split(",");
+                mapa.add(new Tupla( Double.parseDouble(tupla[0]), Double.parseDouble(tupla[1]), Double.parseDouble(tupla[2]), Double.parseDouble(tupla[3]) ));
+            }
         }
         catch(Exception e){
-          e.printStackTrace(System.out);
+            e.printStackTrace(System.out);
+            System.out.println("shits fucked");
         }
-        for (int ii = 0; ii < tablaQ.length; ii++){
+        
+        while (ciclos < ciclosMaximos)
+        {
+            for (int i = 0; i < mapa.size(); i++)
+                ql.actualizarTablaQ(mapa.get(i));
+            
+            ciclos++;
+        }
+        
+        tablaQ = ql.getTablaQ();
+        
+        try {
+            fich = new FileWriter("TablaQ.csv",true);
+            for(int i = 0; i < tablaQ.length; i++) {
+                for(int j = 0; j < tablaQ[0].length; j++) {
+                   fich.write((double)Math.round(tablaQ[i][j]*100)/100 + "\t");
+                }
+                fich.write("\n");
+            }
+            fich.write("\n");
+            fich.close();
+        }
+        catch(Exception e) {
+            e.printStackTrace(System.out);
+        }
+        /*for (int ii = 0; ii < tablaQ.length; ii++){
         	for (int jj = 0; jj < tablaQ[0].length; jj++){
         		tablaQ[ii][jj] = (float) Math.random();
         	}
-        }
+        }*/
     }
 
     public void reset() {
@@ -358,7 +400,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
         situ = 7;
       }
 
-    	float highestQvalue = -1.0f;
+    	double highestQvalue = -1.0;
     	int bestAction = -1;
     	for (int jj = 0; jj < 5; jj++){
     		if (tablaQ[situ][jj] > highestQvalue) {
@@ -376,6 +418,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
     	case 2: action[0] = true; break;
     	case 3: action[3] = true; action[1] = true; break;
     	case 4: action[3] = true; action[0] = true; break;
+    	case 5:
     	default:
     		for (int kk = 0; kk < action.length; kk++){
     			action[kk] = false;
