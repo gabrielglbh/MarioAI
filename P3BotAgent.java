@@ -440,7 +440,7 @@ public class P3BotAgent extends BasicMarioAIAgent implements Agent {
         
         // Codificacion de la accion para la tabla Q
         /* Jump(0) - Right(1) - Left(2) - JumpRight(3) - JumpLeft(4) - RunRight(5) - RunRightJump(6) */
-        boolean []name_actions = new boolean[7];
+        boolean []name_actions = new boolean[5];
         int actionCode = -1;
 
         if(action[3]) actionCode = 0;
@@ -453,13 +453,10 @@ public class P3BotAgent extends BasicMarioAIAgent implements Agent {
 
         if(action[3] && action[0]) actionCode = 4;
 
-        if(action[1] && action[4]) actionCode = 5;
-
-        if(action[3] && action[1] && action[4]) actionCode = 6;
-
         //return name_actions;
 
-        P3FileWriterData.writeOnFile(envi, posMario, dataMatrix, marioState, count, sectionAttrs, actionCode, tick);
+        //P3FileWriterData.writeOnFile( dataMatrix, marioState, count, sectionAttrs, actionCode, tick);
+        P3FileWriterData.createTupla( dataMatrix, marioState, sectionAttrs, actionCode, tick);
 
         return action;
     }

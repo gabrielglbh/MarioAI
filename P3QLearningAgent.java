@@ -44,7 +44,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
     private Random R = null;
     /**
-     * Atributos para almacenar la informaciÃ³n del entorno de Mario
+     * Atributos para almacenar la informacion del entorno de Mario
      * y poder usarla para determinar su comportamiento
      * (para que no vaya como pollo sin cabeza)
      */
@@ -59,22 +59,22 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
     int enemiesInScreen = 0;
 
     final int enemiesSectA = 0;
-    final int obstacSectA = 1;
-    final int coinsSectA = 2;
+    final int obstacSectA  = 1;
+    final int coinsSectA   = 2;
     final int enemiesSectB = 3;
-    final int coinsSectB = 4;
+    final int coinsSectB   = 4;
     final int enemiesSectC = 5;
-    final int obstacSectC = 6;
-    final int coinsSectC = 7;
+    final int obstacSectC  = 6;
+    final int coinsSectC   = 7;
     final int enemiesSectD = 8;
-    final int coinsSectD = 9;
+    final int coinsSectD   = 9;
 
     int tick;
     int count = 0;
     int[] sectionAttrs = new int[10];
 
-    // 8 situaciones * 7 acciones
-    float[][] tablaQ = new float[8][6];
+    // 8 situaciones * 6 acciones
+    float[][] tablaQ = new float[8][5];
 
     public P3QLearningAgent() {
         super("P3BotAgentEntrega");
@@ -163,7 +163,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
         //////// Mas informacion de evaluacion...
         // distancePassedCells, distancePassedPhys, flowersDevoured, killsByFire, killsByShell, killsByStomp, killsTotal, marioMode,
-        // marioStatus(10), mushroomsDevoured, coinsGained (12), timeLeft, timeSpent, hiddenBlocksFound /14
+        // marioStatus(10), mushroomsDevoured, coinsGained (12), timeLeft, timeSpent, hiddenBlocksFound (14)
         //System.out.println("\nINFORMACION DE EVALUACION");
         int[] infoEvaluacion;
         infoEvaluacion = environment.getEvaluationInfoAsInts();
@@ -310,11 +310,10 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
     	int situ = 0;
 
-      /*
-        cuando te quedas atascado refuerzo negativo
+      /*cuando te quedas atascado refuerzo negativo
         No hay estado final.
         Alfa tiene que ir reduciendose progresivamente; pueden ser necesarios ajustes en QLearning;
-            Se puede hacer por tupla o por ciclo de ejecución
+            Se puede hacer por tupla o por ciclo de ejecucion
         Hay dos maneras de generar tabla Q:
             - Entrenar tabla Q aparte y pasarsela en el constructor a P3QLearningAgent
             - O integrar Qlearning en el agente e ir actualizando tabla Q por cada tupla generada / ciclo ejecutado
@@ -341,7 +340,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
         situ = 3;
       }
 
-      //mario suelo y obstauclo delante
+      //mario suelo y obstaculo delante
       else if(sectionAttrs[obstacSectA] > 0 && marioState[0] == 1){
         situ = 4;
       }
@@ -351,7 +350,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
         situ = 5;
       }
 
-      //mario saltando y enemigo por atrás y debajo
+      //mario saltando y enemigo por atras y debajo
       else if((sectionAttrs[enemiesSectC] > 0 || sectionAttrs[enemiesSectD] > 0 ) && marioState[0] == 0){
         situ = 6;
       }
@@ -361,7 +360,7 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
 
     	float highestQvalue = -1.0f;
     	int bestAction = -1;
-    	for (int jj = 0; jj < 6; jj++){
+    	for (int jj = 0; jj < 5; jj++){
     		if (tablaQ[situ][jj] > highestQvalue) {
     			highestQvalue = tablaQ[situ][jj];
     			bestAction = jj;
@@ -377,53 +376,13 @@ public class P3QLearningAgent extends BasicMarioAIAgent implements Agent {
     	case 2: action[0] = true; break;
     	case 3: action[3] = true; action[1] = true; break;
     	case 4: action[3] = true; action[0] = true; break;
-    	case 5: action[1] = true; action[4] = true; break;
     	default:
     		for (int kk = 0; kk < action.length; kk++){
     			action[kk] = false;
     		}
     	}
 
-    	/*
-        if(tick == jumpButtonPressed) {
-      	  action[3] = false;
-      	  jumpButtonPressed = -1;
-        }
-        count++;
-
-        // Si Mario est� en el suelo y puede saltar, el contador se reinicia a 1
-        if(marioState[0] == 1 && marioState[1] == 1){
-          count = 1;
-        }*/
-
-        // Codificacion de la accion para la tabla Q
-        /* Jump(0) - Right(1) - Left(2) - JumpRight(3) - JumpLeft(4) - RunRight(5) - RunRightJump(6) */
-        /*boolean []name_actions = new boolean[7];
-
-        if(action[3]) name_actions[0] = true;
-        else{name_actions[0] = false;}
-
-        if(action[1]) name_actions[1] = true;
-        else{name_actions[1] = false;}
-
-        if(action[0]) name_actions[2] = true;
-        else{name_actions[2] = false;}
-
-        if(action[3] && action[1]) name_actions[3] = true;
-        else{name_actions[3] = false;}
-
-        if(action[3] && action[0]) name_actions[4] = true;
-        else{name_actions[4] = false;}
-
-        if(action[1] && action[4]) name_actions[5] = true;
-        else{name_actions[5] = false;}
-
-        if(action[3] && action[1] && action[4]) name_actions[6] = true;
-        else{name_actions[6] = false;}*/
-
-        //return name_actions;
-
-        //P3FileWriterData.writeOnFile(envi, posMario, dataMatrix, marioState, count, sectionAttrs, name_actions, tick);
+        //P3FileWriterData.writeOnFile(dataMatrix, marioState, count, sectionAttrs, name_actions, tick);
 
         return action;
     }

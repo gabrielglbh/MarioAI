@@ -91,8 +91,8 @@ public final class P3HumanAgent extends KeyAdapter implements Agent {
         count = 1;
       }
    // Codificacion de la accion para la tabla Q
-      /* Jump(0) - Right(1) - Left(2) - JumpRight(3) - JumpLeft(4) - RunRight(5) - RunRightJump(6) */
-      boolean []name_actions = new boolean[7];
+      /* Jump(0) - Right(1) - Left(2) - JumpRight(3) - JumpLeft(4) */
+      boolean []name_actions = new boolean[5];
       int actionCode = -1;
 
       if(Action[3]) actionCode = 0;
@@ -105,11 +105,8 @@ public final class P3HumanAgent extends KeyAdapter implements Agent {
 
       if(Action[3] && Action[0]) actionCode = 4;
 
-      if(Action[1] && Action[4]) actionCode = 5;
-
-      if(Action[3] && Action[1] && Action[4]) actionCode = 6;
-
-      P3FileWriterData.writeOnFile( envi, posMario, dataMatrix, marioState, count, sectionAttrs, actionCode, tick);
+      //P3FileWriterData.writeOnFile( dataMatrix, marioState, count, sectionAttrs, actionCode, tick);
+      P3FileWriterData.createTupla( dataMatrix, marioState, sectionAttrs, actionCode, tick);
     	return Action;
     }
 
